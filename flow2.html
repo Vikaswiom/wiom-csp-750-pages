@@ -1,0 +1,853 @@
+<!-- ================================================================
+     PAYOUT750 — PAGE 2 (content onward), FLOW 2.  Opens straight to the
+     content (the shared announcement cover is in csp-750-page1-cover.html).
+     Fires (all tagged flow:2): Viewed, Progress(content_opened auto on load,
+     reached_choice), Confirmed/Declined + per-block dwell + consent POST, Closed.
+================================================================ -->
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>नया पेआउट तरीका — ₹750 शुरू में</title>
+<style>
+  :root{
+    --brand-600:#D9008D;
+    --brand-300:#FFB2E4;
+    --brand-200:#FFCCED;
+    --brand-100:#FFE5F6;
+    --brand-sec:#443152;
+    --n900:#161021;
+    --n800:#352D42;
+    --n700:#665E75;
+    --n500:#A7A1B2;
+    --n300:#D7D3E0;
+    --n200:#E8E4F0;
+    --n100:#F4F2F8;
+    --white:#FFFFFF;
+    --positive:#1B7F4B;
+    --positive-bg:#E4F5EC;
+    --page-bg:#FFFFFF;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--page-bg);
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Devanagari", "Devanagari MT", sans-serif;
+    color:var(--n900);
+    -webkit-font-smoothing:antialiased;
+  }
+  .phone{
+    max-width:420px;
+    margin:0 auto;
+    background:var(--white);
+    min-height:100vh;
+    box-shadow:0 0 40px rgba(22,16,33,.18);
+    position:relative;
+  }
+  @media (min-width:480px){
+    .phone{ margin:24px auto; border-radius:24px; overflow:hidden; min-height:0; }
+  }
+
+  /* App bar */
+  .appbar{
+    background:var(--brand-sec);
+    color:var(--white);
+    padding:14px 16px;
+    display:flex; align-items:center; gap:12px;
+    position:sticky; top:0; z-index:10;
+  }
+  .appbar .back{ font-size:20px; line-height:1; opacity:.9; }
+  .appbar .title{ font-size:16px; font-weight:700; }
+  .langtoggle{
+    margin-left:auto;
+    border:1px solid rgba(255,255,255,.4);
+    background:rgba(255,255,255,.08);
+    color:var(--white);
+    border-radius:999px;
+    font-family:inherit;
+    font-size:13px; font-weight:700;
+    padding:6px 14px;
+    cursor:pointer;
+  }
+  .langtoggle:focus-visible{ outline:2px solid var(--brand-300); outline-offset:2px; }
+
+  .content{ padding:8px 20px 32px; }
+  .togglerow{ display:flex; justify-content:flex-end; padding:14px 16px 0; }
+  .togglerow .langtoggle{ border:1px solid var(--n300); background:var(--n100); color:var(--n800); }
+  section{ padding:36px 0; }
+  section + section{ border-top:1px solid var(--n100); }
+
+  /* Icon chips */
+  .icircle{
+    width:56px; height:56px; border-radius:50%;
+    background:var(--brand-100);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--brand-600);
+    flex-shrink:0;
+  }
+  .icircle.small{ width:40px; height:40px; }
+  .icircle.neutral{ background:var(--n100); color:var(--n700); }
+  .icircle svg{ display:block; }
+
+  /* Hero */
+  .hero{ text-align:center; display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .hero .eyebrow{
+    font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase;
+    color:var(--n700); margin:0;
+  }
+  .hero .big{
+    font-size:48px; line-height:56px; font-weight:800; margin:0;
+    color:var(--brand-600);
+    font-variant-numeric:tabular-nums;
+  }
+  .hero .bigsub{ font-size:20px; line-height:28px; font-weight:700; margin:-6px 0 0; color:var(--n900); }
+  .hero .line{ font-size:15px; line-height:22px; color:var(--n700); margin:0; max-width:30ch; }
+  .duty{
+    display:flex; align-items:center; gap:12px; text-align:left;
+    background:var(--n100); border-radius:14px; padding:12px 14px;
+    max-width:340px;
+  }
+  .duty p{ margin:0; font-size:14px; line-height:20px; color:var(--n800); }
+  .duty b{ font-weight:700; }
+
+  .section-h{
+    font-size:20px; line-height:28px; font-weight:700; margin:0 0 22px;
+    text-align:center; text-wrap:balance;
+  }
+
+  /* Timeline */
+  .timeline{ display:flex; flex-direction:column; }
+  .trow{ display:flex; gap:16px; }
+  .trail{ display:flex; flex-direction:column; align-items:center; width:40px; flex-shrink:0; }
+  .tline{ width:2px; flex:1; background:var(--brand-200); min-height:24px; }
+  .tbody{ flex:1; padding-bottom:28px; }
+  .trow:last-child .tbody{ padding-bottom:0; }
+  .twhen{
+    font-size:12px; font-weight:700; letter-spacing:.6px; text-transform:uppercase;
+    color:var(--brand-600); display:block; margin:2px 0 4px;
+  }
+  .trow.muted .twhen{ color:var(--n700); }
+  .tmain{ font-size:18px; line-height:26px; font-weight:700; margin:0; }
+  .tmain .amt{ color:var(--brand-600); }
+  .tnote{ font-size:14px; line-height:20px; color:var(--n700); margin:4px 0 0; max-width:32ch; }
+
+  /* Same-payout scenarios */
+  .flatwrap{ text-align:center; }
+  .scen{ display:flex; flex-direction:column; gap:10px; }
+  .srow{
+    display:flex; align-items:center; gap:12px;
+    border:1px solid var(--n200); border-radius:14px;
+    padding:14px 16px; text-align:left;
+  }
+  .srow .who{ flex:1; font-size:15px; line-height:21px; color:var(--n800); margin:0; }
+  .srow .sarrow{ color:var(--n500); font-size:16px; flex-shrink:0; }
+  .srow .chip{
+    background:var(--brand-100); border:1px solid var(--brand-200);
+    color:var(--brand-600); font-size:18px; font-weight:800;
+    border-radius:10px; padding:8px 16px; flex-shrink:0;
+    font-variant-numeric:tabular-nums;
+  }
+  .verdict{
+    margin:22px auto 0; font-size:16px; line-height:24px; font-weight:700;
+    max-width:28ch;
+  }
+  .snote{
+    margin:12px auto 0; font-size:13px; line-height:19px; color:var(--n700);
+    max-width:32ch;
+  }
+
+  /* Key points */
+  .twoq{ display:flex; flex-direction:column; gap:10px; }
+  .qcard{
+    border:1px solid var(--n200); border-radius:12px; padding:14px 16px;
+  }
+  .qcard .q{ margin:0 0 4px; font-size:15px; line-height:21px; font-weight:700; }
+  .qcard .a{ margin:0; font-size:14px; line-height:20px; color:var(--n800); }
+  .qcard .a b{ color:var(--brand-600); }
+
+  /* Choice */
+  .choice{ display:flex; flex-direction:column; gap:12px; }
+  .choice .csub{ text-align:center; font-size:14px; line-height:20px; color:var(--n700); margin:-14px 0 8px; }
+  .opt{
+    border:2px solid var(--n300); border-radius:14px; padding:16px;
+    cursor:pointer; display:flex; gap:12px; align-items:flex-start;
+    background:var(--white); transition:border-color .15s, background .15s;
+  }
+  .opt:focus-visible{ outline:3px solid var(--brand-300); outline-offset:2px; }
+  .opt .radio{
+    width:22px; height:22px; border-radius:50%; border:2px solid var(--n500);
+    flex-shrink:0; margin-top:1px; position:relative;
+  }
+  .opt.selected{ border-color:var(--brand-600); background:var(--brand-100); }
+  .opt.selected .radio{ border-color:var(--brand-600); }
+  .opt.selected .radio::after{
+    content:""; position:absolute; inset:3px; border-radius:50%; background:var(--brand-600);
+  }
+  .opt h3{ margin:0 0 3px; font-size:16px; line-height:24px; font-weight:700; }
+  .opt p{ margin:0; font-size:14px; line-height:20px; color:var(--n700); }
+
+  .cta{
+    display:block; width:100%; border:0; border-radius:14px;
+    padding:16px; font-size:16px; font-weight:700; font-family:inherit;
+    background:var(--n500); color:var(--white); cursor:not-allowed;
+    margin-top:6px;
+  }
+  .cta.ready{ background:var(--brand-600); cursor:pointer; }
+  .cta.ready:focus-visible{ outline:3px solid var(--brand-300); outline-offset:2px; }
+
+  /* Confirmation */
+  .confirm{
+    display:none;
+    border-radius:14px; padding:16px;
+    font-size:15px; line-height:22px;
+  }
+  .confirm.show{ display:block; }
+  .confirm.optin{ background:var(--brand-100); border:1px solid var(--brand-200); }
+  .confirm.later{ background:var(--n100); border:1px solid var(--n200); }
+  .confirm h3{ margin:0 0 6px; font-size:16px; font-weight:700; }
+  .confirm p{ margin:0 0 6px; }
+  .confirm p:last-child{ margin-bottom:0; }
+  .confirm .eff{ font-weight:700; }
+  .confirm .note{ font-size:13px; line-height:18px; color:var(--n700); }
+
+  /* Sticky decision bar */
+  .decisionbar{
+    position:sticky; bottom:0; z-index:9;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%;
+    border:0; font-family:inherit; cursor:pointer;
+    background:var(--brand-sec); color:var(--white);
+    padding:15px 18px;
+    padding-bottom:calc(15px + env(safe-area-inset-bottom));
+    font-size:15px; font-weight:700; line-height:21px;
+    box-shadow:0 -4px 16px rgba(22,16,33,.16);
+    transition:opacity .2s, visibility .2s;
+    text-align:center;
+  }
+  .decisionbar .arrow{
+    display:inline-flex; width:22px; height:22px; border-radius:50%;
+    background:rgba(255,255,255,.15); align-items:center; justify-content:center;
+    font-size:13px; flex-shrink:0;
+  }
+  .decisionbar.done{ background:var(--positive); }
+  .decisionbar.off{ opacity:0; visibility:hidden; pointer-events:none; }
+  .decisionbar:focus-visible{ outline:3px solid var(--brand-300); outline-offset:-3px; }
+
+  /* Confirmation page — white full page, सारे काम देखें pinned at the bottom */
+  .donepage{
+    position:fixed; top:0; left:50%; transform:translateX(-50%);
+    width:100%; max-width:420px; height:100%; height:100dvh; z-index:30;
+    background:var(--white); color:var(--n900);
+    display:flex; flex-direction:column;
+    transition:opacity .35s, visibility .35s;
+  }
+  @media (min-width:480px){
+    .donepage{ top:24px; bottom:24px; height:auto; border-radius:24px; overflow:hidden; }
+  }
+  .donepage.gone{ opacity:0; visibility:hidden; pointer-events:none; }
+  .dbody{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap:14px; padding:24px 28px;
+  }
+  .dbody .icircle{ width:64px; height:64px; font-size:30px; font-weight:700; }
+  .dh{ font-size:22px; line-height:30px; font-weight:700; margin:0; max-width:22ch; text-wrap:balance; }
+  .dp{ font-size:15px; line-height:22px; color:var(--n800); margin:0; max-width:30ch; }
+  .dp.eff{ font-weight:700; color:var(--n900); }
+  .dnote{ font-size:13px; line-height:18px; color:var(--n700); margin:0; max-width:30ch; }
+  .dfoot{ padding:16px 20px calc(20px + env(safe-area-inset-bottom)); }
+  .alltasks{
+    display:block; width:100%;
+    border:0; border-radius:14px;
+    background:var(--brand-600); color:var(--white);
+    font-family:inherit; font-size:16px; font-weight:700;
+    padding:16px; cursor:pointer;
+  }
+  .alltasks:active{ transform:scale(.98); }
+  .alltasks:focus-visible{ outline:3px solid var(--brand-300); outline-offset:2px; }
+
+  /* Announcement cover */
+  .cover{
+    position:fixed; top:0; bottom:0; left:50%; transform:translateX(-50%);
+    width:100%; max-width:420px; z-index:30;
+    background:var(--brand-sec); color:var(--white);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap:14px; padding:32px 28px;
+    transition:opacity .35s, visibility .35s;
+  }
+  @media (min-width:480px){
+    .cover{ top:24px; bottom:24px; border-radius:24px; }
+  }
+  .cover.gone{ opacity:0; visibility:hidden; pointer-events:none; }
+  .cover .clang{ position:absolute; top:16px; right:16px; margin-left:0; }
+  .cover .ceyebrow{
+    font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase;
+    color:var(--brand-300); margin:0;
+  }
+  .cover .cicon{
+    width:64px; height:64px; border-radius:50%;
+    background:rgba(255,255,255,.1); color:var(--brand-300);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .cover .ctitle{
+    font-size:22px; line-height:30px; font-weight:700; margin:0;
+    max-width:22ch; text-wrap:balance;
+  }
+  .cover .cline{
+    font-size:15px; line-height:22px; color:rgba(255,255,255,.85); margin:0;
+    max-width:28ch;
+  }
+  .cover .ccta{
+    margin-top:10px; border:0; border-radius:14px;
+    background:var(--brand-600); color:var(--white);
+    font-family:inherit; font-size:16px; font-weight:700;
+    padding:16px 32px; cursor:pointer;
+  }
+  .cover .ccta:focus-visible{ outline:3px solid var(--brand-300); outline-offset:2px; }
+  body.locked{ overflow:hidden; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; scroll-behavior:auto !important; }
+  }
+  .cover{ display:none !important; }
+</style>
+
+<div class="phone">
+  <span id="cspidTok" style="display:none">{{ Profile.cspid | default: "" }}</span>
+  <div class="cover" id="cover">
+    <button class="langtoggle clang" id="langToggle2" aria-label="Switch language">English</button>
+    <span class="cicon" aria-hidden="true">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h6"/>
+      </svg>
+    </span>
+    <p class="ceyebrow" data-i18n="covEyebrow">नए कनेक्शन का पेआउट</p>
+    <p class="ctitle" data-i18n="covTitle">पेआउट का नया तरीका आया है</p>
+    <p class="cline" data-i18n="covLine">इसे देखकर आपको चुनना है — नया तरीका लें या अभी वाला रखें।</p>
+    <button class="ccta" id="coverBtn" data-i18n="covCta">देखें और चुनें</button>
+  </div>
+
+  <div class="togglerow">
+    <button class="langtoggle" id="langToggle" aria-label="Switch language">English</button>
+  </div>
+
+  <div class="content">
+
+    <!-- 1. Hero: payout + responsibility together -->
+    <section class="hero">
+      <p class="eyebrow" data-i18n="eyebrow">नए कनेक्शन पर</p>
+      <div class="icircle" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 3h12M6 8h12M14.5 21 6 13h3a5 5 0 0 0 0-10"/>
+        </svg>
+      </div>
+      <p class="big">750</p>
+      <p class="bigsub" data-i18n="heroSub">एक साथ, शुरू में ही</p>
+      <p class="line" data-i18n="heroLine">यह पहले 3 महीने का पेआउट है — हर नए कनेक्शन पर।</p>
+      <div class="duty">
+        <div class="icircle small neutral" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-3 8-9V5l-8-3-8 3v8c0 6 8 9 8 9z"/><path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <p data-i18n="heroDuty"><b>ज़िम्मेदारी:</b> शुरू में एक बार 3 महीने का ISP रिचार्ज + पहले 3 महीने की सर्विस।</p>
+      </div>
+    </section>
+
+    <!-- 2. Timeline -->
+    <section>
+      <h2 class="section-h" data-i18n="tlHead">पूरा सफ़र, एक नज़र में</h2>
+      <div class="timeline">
+        <div class="trow">
+          <div class="trail">
+            <div class="icircle small" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 3h12M6 8h12M14.5 21 6 13h3a5 5 0 0 0 0-10"/>
+              </svg>
+            </div>
+            <span class="tline"></span>
+          </div>
+          <div class="tbody">
+            <span class="twhen" data-i18n="t1When">दिन 0 — नए कनेक्शन के साथ</span>
+            <p class="tmain"><span class="amt">₹750</span> <span data-i18n="t1Main">एक साथ</span></p>
+            <p class="tnote" data-i18n="t1Note">3 महीने का ISP रिचार्ज करें, प्रूफ़ ऐप पर अपलोड करें — ₹750 मिल जाएगा।</p>
+          </div>
+        </div>
+        <div class="trow muted">
+          <div class="trail">
+            <div class="icircle small neutral" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18"/><text x="12" y="18" text-anchor="middle" font-size="8" fill="currentColor" stroke="none" font-weight="bold">3</text>
+              </svg>
+            </div>
+            <span class="tline"></span>
+          </div>
+          <div class="tbody">
+            <span class="twhen" data-i18n="t2When">महीना 1 – 3</span>
+            <p class="tmain" data-i18n="t2Main">कोई अलग पेआउट नहीं</p>
+            <p class="tnote" data-i18n="t2Note">पेआउट और रिचार्ज दोनों शुरू में हो चुके। इन महीनों में सर्विस आपकी ज़िम्मेदारी है।</p>
+          </div>
+        </div>
+        <div class="trow">
+          <div class="trail">
+            <div class="icircle small" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 2v4H7a4 4 0 0 0-4 4v1"/><path d="M7 22v-4h10a4 4 0 0 0 4-4v-1"/><path d="m14 5 3 1-3 1M10 19l-3-1 3-1"/>
+              </svg>
+            </div>
+          </div>
+          <div class="tbody">
+            <span class="twhen" data-i18n="t3When">महीना 4 से आगे</span>
+            <p class="tmain"><span class="amt">₹300</span> <span data-i18n="t3Main">हर रिन्यूअल पर</span></p>
+            <p class="tnote" data-i18n="t3Note">जब भी 1 महीने का रिन्यूअल टिकट बनेगा, उस पर ₹300।</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Edge case -->
+    <section class="flatwrap">
+      <h2 class="section-h" data-i18n="flatHead">ग्राहक जल्दी बंद कर दे तो?</h2>
+      <div class="scen" role="img" data-i18n-aria="flatAria" aria-label="ग्राहक 1 दिन चले, 1 महीना चले, या पूरे 3 महीने — तीनों में पेआउट ₹750 ही है">
+        <div class="srow">
+          <p class="who" data-i18n="bar1">ग्राहक <b>1 दिन</b> चला</p>
+          <span class="sarrow" aria-hidden="true">→</span>
+          <span class="chip">₹750</span>
+        </div>
+        <div class="srow">
+          <p class="who" data-i18n="bar2">ग्राहक <b>1 महीना</b> चला</p>
+          <span class="sarrow" aria-hidden="true">→</span>
+          <span class="chip">₹750</span>
+        </div>
+        <div class="srow">
+          <p class="who" data-i18n="bar3">ग्राहक <b>पूरे 3 महीने</b> चला</p>
+          <span class="sarrow" aria-hidden="true">→</span>
+          <span class="chip">₹750</span>
+        </div>
+      </div>
+      <p class="verdict" data-i18n="flatVerdict">₹750 नहीं बदलेगा — न कम, न ज़्यादा।</p>
+      <p class="snote" data-i18n="flatDuty">तीनों में 3 महीने का रिचार्ज और सर्विस ज़िम्मेदारी वही रहेगी।</p>
+    </section>
+
+    <!-- 4. Key points -->
+    <section class="twoq">
+      <h2 class="section-h" data-i18n="checkHead">दो ज़रूरी बातें</h2>
+      <div class="qcard">
+        <p class="q" data-i18n="k1q">ग्राहक जल्दी बंद करे तो?</p>
+        <p class="a" data-i18n="k1a"><b>₹750 नहीं बदलेगा</b> — ज़िम्मेदारी भी वही रहेगी।</p>
+      </div>
+      <div class="qcard">
+        <p class="q" data-i18n="k2q">3 महीने के बाद?</p>
+        <p class="a" data-i18n="k2a">हर <b>1 महीने के रिन्यूअल टिकट</b> पर <b>₹300</b>।</p>
+      </div>
+    </section>
+
+    <!-- 5. Choice -->
+    <section class="choice" id="choiceSection">
+      <h2 class="section-h" data-i18n="chHead">पेआउट का तरीका चुनें</h2>
+
+      <div class="opt" id="optNew" role="radio" aria-checked="false" tabindex="0">
+        <span class="radio" aria-hidden="true"></span>
+        <div>
+          <h3 data-i18n="optNewH">नया तरीका: ₹750 शुरू में ही</h3>
+          <p data-i18n="optNewP">शुरू में 3 महीने का रिचार्ज + प्रूफ़ अपलोड → ₹750 एक साथ। 3 महीने बाद ₹300 हर रिन्यूअल टिकट पर।</p>
+        </div>
+      </div>
+
+      <div class="opt" id="optLater" role="radio" aria-checked="false" tabindex="0">
+        <span class="radio" aria-hidden="true"></span>
+        <div>
+          <h3 data-i18n="optLaterH">अभी नहीं</h3>
+          <p data-i18n="optLaterP">अभी वाला तरीका चलता रहेगा।</p>
+        </div>
+      </div>
+
+      <button class="cta" id="confirmBtn" disabled data-i18n="ctaNone">पहले ऊपर से एक चुनें</button>
+
+      <div class="confirm optin" id="confirmNew">
+        <h3 data-i18n="cnH">नया तरीका चुन लिया गया</h3>
+        <p data-i18n="cnP">तरीका: <b>₹750 शुरू में + ₹300 हर रिन्यूअल टिकट पर</b></p>
+        <p class="eff" id="effDate"></p>
+        <p class="note" data-i18n="cnNote">इस तारीख़ के बाद लगने वाले नए कनेक्शनों पर लागू होगा। पहले के कनेक्शनों पर पुराना तरीका रहेगा।</p>
+      </div>
+
+      <div class="confirm later" id="confirmLater">
+        <h3 data-i18n="clH">ठीक है — अभी कोई बदलाव नहीं</h3>
+        <p data-i18n="clP">अभी वाला पेआउट तरीका चलता रहेगा।</p>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="donepage gone" id="donePage" aria-live="polite">
+    <div class="dbody">
+      <span class="icircle" aria-hidden="true">✓</span>
+      <p class="dh" id="dpH" data-i18n="cnH">नया तरीका चुन लिया गया</p>
+      <p class="dp" id="dpP" data-i18n="cnP">तरीका: <b>₹750 शुरू में + ₹300 हर रिन्यूअल टिकट पर</b></p>
+      <p class="dp eff" id="dpEff"></p>
+      <p class="dnote" id="dpNote" data-i18n="cnNote">यह आज के बाद लगे नए कनेक्शनों पर लागू होगा। पहले के कनेक्शन पुराने तरीके पर ही रहेंगे।</p>
+    </div>
+    <div class="dfoot">
+      <button class="alltasks" id="endBtn" data-i18n="endCta">सारे काम देखें</button>
+    </div>
+  </div>
+
+  <div class="donepage gone" id="auditPage" aria-live="polite">
+    <div class="dbody">
+      <span class="icircle" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+        </svg>
+      </span>
+      <p class="dh" data-i18n="auditH">पहले ऑडिट कंसेंट फॉर्म साइन करें</p>
+      <p class="dp" data-i18n="auditP">प्लान से जुड़ने से पहले ऑडिट कंसेंट फॉर्म पे साइन ज़रूरी है। साइन होते ही यह प्लान आपके लिए एक्टिव हो जाएगा।</p>
+    </div>
+    <div class="dfoot">
+      <button class="alltasks" id="auditBtn" data-i18n="auditCta">मैं साइन करने के लिए तैयार हूँ</button>
+    </div>
+  </div>
+
+  <div class="donepage gone" id="thanksPage" aria-live="polite">
+    <div class="dbody">
+      <span class="icircle" aria-hidden="true">✓</span>
+      <p class="dh" data-i18n="thanksH">धन्यवाद! आपकी सहमति नोट कर ली गई है</p>
+      <p class="dp" data-i18n="thanksP">टीम आपसे जल्द ही संपर्क करेगी</p>
+    </div>
+    <div class="dfoot">
+      <button class="alltasks" id="okBtn" data-i18n="endCta">सारे काम देखें</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const STR = {
+    hi: {
+      appTitle: 'पेआउट का तरीका',
+      toggle: 'English',
+      eyebrow: 'नए कनेक्शन पर',
+      heroSub: 'एक साथ, शुरू में ही',
+      heroLine: 'यह पहले 3 महीने का पेआउट है — हर नए कनेक्शन पर।',
+      heroDuty: '<b>ज़िम्मेदारी:</b> शुरू में एक बार 3 महीने का ISP रिचार्ज + पहले 3 महीने की सर्विस।',
+      tlHead: 'पूरा सफ़र, एक नज़र में',
+      t1When: 'दिन 0 — नए कनेक्शन के साथ', t1Main: 'एक साथ',
+      t1Note: '3 महीने का ISP रिचार्ज करें, प्रूफ़ ऐप पर अपलोड करें — ₹750 मिल जाएगा।',
+      t2When: 'महीना 1 – 3', t2Main: 'कोई अलग पेआउट नहीं',
+      t2Note: 'पेआउट और रिचार्ज दोनों शुरू में हो चुके। इन महीनों में सर्विस आपकी ज़िम्मेदारी है।',
+      t3When: 'महीना 4 से आगे', t3Main: 'हर रिन्यूअल पर',
+      t3Note: 'जब भी 1 महीने का रिन्यूअल टिकट बनेगा, उस पर ₹300।',
+      flatHead: 'ग्राहक जल्दी बंद कर दे तो?',
+      flatAria: 'ग्राहक 1 दिन चले, 1 महीना चले, या पूरे 3 महीने — तीनों में पेआउट ₹750 ही है',
+      bar1: 'ग्राहक <b>1 दिन</b> चला', bar2: 'ग्राहक <b>1 महीना</b> चला', bar3: 'ग्राहक <b>पूरे 3 महीने</b> चला',
+      flatVerdict: '₹750 नहीं बदलेगा — न कम, न ज़्यादा।',
+      flatDuty: 'तीनों में 3 महीने का रिचार्ज और सर्विस ज़िम्मेदारी वही रहेगी।',
+      checkHead: 'दो ज़रूरी बातें',
+      k1q: 'ग्राहक जल्दी बंद करे तो?', k1a: '<b>₹750 नहीं बदलेगा</b> — ज़िम्मेदारी भी वही रहेगी।',
+      k2q: '3 महीने के बाद?', k2a: 'हर <b>1 महीने के रिन्यूअल टिकट</b> पर <b>₹300</b>।',
+      chHead: 'पेआउट का तरीका चुनें',
+      optNewH: 'नया तरीका: ₹750 शुरू में ही',
+      optNewP: 'शुरू में 3 महीने का रिचार्ज + प्रूफ़ अपलोड → ₹750 एक साथ। 3 महीने बाद ₹300 हर रिन्यूअल टिकट पर।',
+      optLaterH: 'अभी नहीं',
+      optLaterP: 'अभी वाला तरीका चलता रहेगा।',
+      ctaNone: 'पहले ऊपर से एक चुनें',
+      ctaNew: 'नया तरीका पक्का करें',
+      ctaLater: 'अभी नहीं — पक्का करें',
+      cnH: 'नया तरीका चुन लिया गया',
+      cnP: 'तरीका: <b>₹750 शुरू में + ₹300 हर रिन्यूअल टिकट पर</b>',
+      cnNote: 'इस तारीख़ के बाद लगने वाले नए कनेक्शनों पर लागू होगा। पहले के कनेक्शनों पर पुराना तरीका रहेगा।',
+      clH: 'ठीक है — अभी कोई बदलाव नहीं',
+      clP: 'अभी वाला पेआउट तरीका चलता रहेगा।',
+      effPrefix: 'लागू तारीख़: ',
+      months: ['जनवरी','फ़रवरी','मार्च','अप्रैल','मई','जून','जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर'],
+      barPending: 'पूरा देखें, फिर अपना तरीका चुनें',
+      barDoneNew: 'फ़ैसला हो गया — नया तरीका चुना',
+      barDoneLater: 'फ़ैसला हो गया — अभी नहीं',
+      covEyebrow: 'नए कनेक्शन का पेआउट',
+      covTitle: 'पेआउट का नया तरीका आया है',
+      covLine: 'इसे देखकर आपको चुनना है — नया तरीका लें या अभी वाला रखें।',
+      covCta: 'देखें और चुनें',
+      docTitle: 'नया पेआउट तरीका — ₹750 शुरू में',
+      endCta: 'सारे काम देखें',
+      auditH: 'पहले ऑडिट कंसेंट फॉर्म साइन करें',
+      auditP: 'प्लान से जुड़ने से पहले ऑडिट कंसेंट फॉर्म पे साइन ज़रूरी है। साइन होते ही यह प्लान आपके लिए एक्टिव हो जाएगा।',
+      auditCta: 'मैं साइन करने के लिए तैयार हूँ',
+      thanksH: 'धन्यवाद! आपकी सहमति नोट कर ली गई है',
+      thanksP: 'टीम आपसे जल्द ही संपर्क करेगी',
+      okCta: 'ठीक है'
+    },
+    en: {
+      appTitle: 'Payout Structure',
+      toggle: 'हिंदी',
+      eyebrow: 'On every new connection',
+      heroSub: 'in one go, right at the start',
+      heroLine: 'This is the payout for the first 3 months — on every new connection.',
+      heroDuty: '<b>Your responsibility:</b> one 3-month ISP recharge at the start + service for the first 3 months.',
+      tlHead: 'The full journey, at a glance',
+      t1When: 'Day 0 — with the new connection', t1Main: 'in one go',
+      t1Note: 'Do the 3-month ISP recharge, upload proof on the app — ₹750 is paid.',
+      t2When: 'Month 1 – 3', t2Main: 'No separate payout',
+      t2Note: 'Payout and recharge are both done at the start. Service is your responsibility through these months.',
+      t3When: 'Month 4 onwards', t3Main: 'per renewal',
+      t3Note: 'Whenever a 1-month renewal ticket is generated, you get ₹300 for it.',
+      flatHead: 'What if the customer stops early?',
+      flatAria: 'Customer stays 1 day, 1 month, or full 3 months — payout is ₹750 in all three cases',
+      bar1: 'Customer stayed <b>1 day</b>', bar2: 'Customer stayed <b>1 month</b>', bar3: 'Customer stayed the <b>full 3 months</b>',
+      flatVerdict: '₹750 does not change — no less, no more.',
+      flatDuty: 'In all three cases, the 3-month recharge and service responsibility stay the same.',
+      checkHead: 'Two things to remember',
+      k1q: 'If the customer stops early?', k1a: '<b>₹750 does not change</b> — and the responsibility stays the same.',
+      k2q: 'After 3 months?', k2a: '<b>₹300</b> for every <b>1-month renewal ticket</b>.',
+      chHead: 'Choose your payout structure',
+      optNewH: 'New structure: ₹750 at the start',
+      optNewP: '3-month recharge + proof upload at the start → ₹750 in one go. After 3 months, ₹300 per renewal ticket.',
+      optLaterH: 'Not now',
+      optLaterP: 'Your current structure continues as is.',
+      ctaNone: 'Select one option above',
+      ctaNew: 'Confirm new structure',
+      ctaLater: 'Not now — confirm',
+      cnH: 'New structure selected',
+      cnP: 'Structure: <b>₹750 at the start + ₹300 per renewal ticket</b>',
+      cnNote: 'Applies to new connections installed after this date. Earlier connections stay on the old structure.',
+      clH: 'Okay — no change for now',
+      clP: 'Your current payout structure continues.',
+      effPrefix: 'Effective date: ',
+      months: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+      barPending: 'Review the full structure, then choose yours',
+      barDoneNew: 'Decision made — new structure chosen',
+      barDoneLater: 'Decision made — not now',
+      covEyebrow: 'New connection payout',
+      covTitle: 'A new payout structure is here',
+      covLine: 'Review it and choose — take the new structure or keep your current one.',
+      covCta: 'Review & choose',
+      docTitle: 'New Payout Structure — ₹750 at the Start',
+      endCta: 'View all tasks',
+      auditH: 'Sign the audit consent form first',
+      auditP: 'Before joining the plan, the audit consent form must be signed. As soon as it is signed, this plan will be activated for you.',
+      auditCta: 'I am ready to sign',
+      thanksH: 'Thank you! Your consent has been noted',
+      thanksP: 'The team will contact you soon',
+      okCta: 'Okay'
+    }
+  };
+
+  let lang = 'hi';
+  let selected = null;
+  let confirmed = null;
+  let confirmedDate = null;
+
+  const btn = document.getElementById('confirmBtn');
+  const optNew = document.getElementById('optNew');
+  const optLater = document.getElementById('optLater');
+  const confirmNew = document.getElementById('confirmNew');
+  const confirmLater = document.getElementById('confirmLater');
+  const toggle = document.getElementById('langToggle');
+
+  function render(){
+    const s = STR[lang];
+    document.documentElement.lang = lang;
+    document.title = s.docTitle;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const v = s[el.getAttribute('data-i18n')];
+      if (v !== undefined) el.innerHTML = v;
+    });
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+      const v = s[el.getAttribute('data-i18n-aria')];
+      if (v !== undefined) el.setAttribute('aria-label', v);
+    });
+    document.querySelectorAll('.langtoggle').forEach(b => b.textContent = s.toggle);
+    btn.textContent = selected ? (selected === 'new' ? s.ctaNew : s.ctaLater) : s.ctaNone;
+    if (confirmedDate) {
+      const effTxt = s.effPrefix + confirmedDate.getDate() + ' ' + s.months[confirmedDate.getMonth()] + ' ' + confirmedDate.getFullYear();
+      document.getElementById('effDate').textContent = effTxt;
+      document.getElementById('dpEff').textContent = effTxt;
+    }
+  }
+
+  document.querySelectorAll('.langtoggle').forEach(b => b.addEventListener('click', () => {
+    lang = lang === 'hi' ? 'en' : 'hi';
+    render();
+  }));
+
+  const cover = document.getElementById('cover');
+  document.body.classList.add('locked');
+  document.getElementById('coverBtn').addEventListener('click', () => {
+    cover.classList.add('gone');
+    document.body.classList.remove('locked');
+  });
+
+  function select(which){
+    selected = which;
+    confirmed = null;
+    optNew.classList.toggle('selected', which === 'new');
+    optLater.classList.toggle('selected', which === 'later');
+    optNew.setAttribute('aria-checked', which === 'new');
+    optLater.setAttribute('aria-checked', which === 'later');
+    btn.disabled = false;
+    btn.classList.add('ready');
+    confirmNew.classList.remove('show');
+    confirmLater.classList.remove('show');
+    render();
+  }
+
+  function activate(el, which){
+    el.addEventListener('click', () => select(which));
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(which); }
+    });
+  }
+  activate(optNew, 'new');
+  activate(optLater, 'later');
+
+  btn.addEventListener('click', () => {
+    if (!selected) return;
+    confirmed = selected;
+    if (selected === 'new') {
+      confirmedDate = new Date();
+      confirmNew.classList.add('show');
+      confirmLater.classList.remove('show');
+    } else {
+      confirmLater.classList.add('show');
+      confirmNew.classList.remove('show');
+    }
+    // Next page — Flow 2: opting in leads to the audit-pending page first;
+    // "not now" keeps the plain confirmation page.
+    render();
+    if (confirmed === 'new') {
+      document.getElementById('auditPage').classList.remove('gone');
+    } else {
+      document.getElementById('dpH').setAttribute('data-i18n', 'clH');
+      document.getElementById('dpP').setAttribute('data-i18n', 'clP');
+      document.getElementById('dpEff').style.display = 'none';
+      document.getElementById('dpNote').style.display = 'none';
+      render();
+      document.getElementById('donePage').classList.remove('gone');
+    }
+    document.body.classList.add('locked');
+  });
+
+  // In the app this returns to the task list; standalone it just goes back if it can.
+  document.getElementById('endBtn').addEventListener('click', () => history.back());
+
+  // Flow 2: audit CTA leads to the thank-you page; ठीक है exits like endBtn.
+  document.getElementById('auditBtn').addEventListener('click', () => {
+    document.getElementById('auditPage').classList.add('gone');
+    document.getElementById('thanksPage').classList.remove('gone');
+  });
+  document.getElementById('okBtn').addEventListener('click', () => history.back());
+
+  render();
+</script>
+
+<script>
+/* Payout750 instrumentation + backend consent — self-contained, FLOW 2.
+   Adds funnel events, per-block dwell (viewport-centre sampler) and the opt-in
+   consent POST WITHOUT touching the page's own UI logic (it only observes). */
+(function(){
+  var FLOW = 2;
+  var EV = 'Payout750_', t0 = Date.now(), sent = {}, ended = false;
+  var DEBUG = (location.protocol === 'file:');
+  function ctPush(ev, props){
+    try{ if (window.CleverTap && typeof window.CleverTap.pushEvent === 'function'){
+      props ? window.CleverTap.pushEvent(ev, JSON.stringify(props)) : window.CleverTap.pushEvent(ev); return true; } }catch(e){}
+    try{ var wk = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap;
+      if (wk){ wk.postMessage({ action:'recordEventWithProps', event:ev, properties:props||{} }); return true; } }catch(e){}
+    return false;
+  }
+  function track(name, props){
+    props = props || {}; props.flow = FLOW;
+    var ev = EV + name, key = ev + '|' + JSON.stringify(props);
+    if (sent[key]) return; sent[key] = 1;
+    if (DEBUG){ try{ console.log('[track]', ev, props); }catch(e){} }
+    var n = 0; (function go(){ n++; if (ctPush(ev, props)) return; if (n < 6) setTimeout(go, 250 * n); })();
+  }
+  function secs(){ return Math.round((Date.now() - t0) / 1000); }
+
+  var BLOCKS = [['hero'], ['timeline'], ['scenarios'], ['keypoints'], ['choice']];
+  var blkEls = document.querySelectorAll('.content > section');
+  var dwellMs = {}, contentOpen = false, pageVis = true, maxIdx = 0, lastTick = null, choiceReached = false;
+  var langToggles = 0, selectionChanges = 0, lastSelected = null;
+  BLOCKS.forEach(function(b, i){ b.el = blkEls[i]; if (b.el) b.el.setAttribute('data-block', b[0]); dwellMs[b[0]] = 0; });
+  function idxOf(k){ for (var i=0;i<BLOCKS.length;i++){ if (BLOCKS[i][0]===k) return i; } return 0; }
+  function currentBlock(){
+    var mid = window.innerHeight/2;
+    for (var i=0;i<BLOCKS.length;i++){ var el=BLOCKS[i].el; if(!el) continue;
+      var rc = el.getBoundingClientRect(); if (rc.top<=mid && rc.bottom>mid) return BLOCKS[i][0]; }
+    return null;
+  }
+  function tick(){
+    var now = Date.now();
+    if (contentOpen && pageVis && lastTick != null){
+      var b = currentBlock();
+      if (b){ dwellMs[b] += now - lastTick; var idx = idxOf(b); if (idx>maxIdx) maxIdx=idx;
+        if (b==='choice' && !choiceReached){ choiceReached=true; track('Progress', { milestone:'reached_choice' }); } }
+    }
+    lastTick = now;
+  }
+  setInterval(tick, 400);
+  window.addEventListener('scroll', tick, { passive:true });
+  function pauseAll(){ tick(); lastTick = null; }
+  function resumeAll(){ lastTick = Date.now(); }
+  function dwellProps(){ tick(); var o={}; BLOCKS.forEach(function(b){ o['sec_'+b[0]] = Math.round(dwellMs[b[0]]/1000); }); o.max_block = BLOCKS[Math.max(0,maxIdx)][0]; return o; }
+
+  /* backend consent (source of truth) */
+  var API = { base:'https://csp-api.i2e1.in', path:'/dominance/consent' };
+  var CSP_ID_FIXED = '';
+  var apiStatus='idle', apiErr='', apiHttp=0;
+  function qp(n){ try{ return new URLSearchParams(location.search).get(n)||''; }catch(e){ return ''; } }
+  function cspId(){ var el=document.getElementById('cspidTok'); var v=el?(el.textContent||'').trim():'';
+    if (v && v.indexOf('{')<0) return v; return window.CSP_ID || CSP_ID_FIXED || qp('cspId') || qp('csp_id') || ''; }
+  function cspJwt(){ return window.CSP_JWT || qp('token') || qp('jwt') || ''; }
+  function postConsent(consent, attempt){
+    var id=cspId(); if(!id){ apiStatus='skipped'; apiErr='no_csp_id'; return; }
+    var headers={'Content-Type':'application/json'}; var tok=cspJwt(); if(tok) headers['Authorization']='Bearer '+tok;
+    apiStatus='saving';
+    fetch(API.base+API.path,{method:'POST',headers:headers,body:JSON.stringify({csp_id:id,consent_choice:consent,flow:FLOW}),keepalive:true})
+      .then(function(r){ apiHttp=r.status; if(r.ok){apiStatus='ok';return;}
+        if(r.status>=500&&attempt<3){ setTimeout(function(){postConsent(consent,attempt+1);},800*attempt); return; }
+        apiStatus='error'; apiErr='http_'+r.status; })
+      .catch(function(){ if(attempt<3){ setTimeout(function(){postConsent(consent,attempt+1);},800*attempt); return; } apiStatus='error'; apiErr='network'; });
+  }
+
+  function currentChoice(){
+    var n=document.getElementById('optNew'), l=document.getElementById('optLater');
+    if (n && n.classList.contains('selected')) return 'new';
+    if (l && l.classList.contains('selected')) return 'later';
+    return 'none';
+  }
+  function closeOut(reason){
+    if (ended) return; ended = true; pauseAll();
+    var p = dwellProps();
+    p.exit=reason; p.choice=(window.__p750_choice||'none'); p.last_selected=lastSelected||'none';
+    p.lang=document.documentElement.lang||'hi'; p.lang_toggles=langToggles; p.selection_changes=selectionChanges; p.seconds=secs();
+    p.api_status=apiStatus; p.api_error=apiErr||'none'; p.api_http=apiHttp;
+    track('Closed', p);
+  }
+
+  function on(id, fn){ var el=document.getElementById(id); if (el) el.addEventListener('click', fn); }
+  document.querySelectorAll('.langtoggle').forEach(function(b){ b.addEventListener('click', function(){ langToggles++; }); });
+  on('coverBtn', function(){ contentOpen=true; resumeAll(); track('Progress', { milestone:'content_opened' }); });
+  function selWatch(which){ var el=document.getElementById(which==='new'?'optNew':'optLater'); if(!el) return;
+    var handler=function(){ if(lastSelected!==which) selectionChanges++; lastSelected=which; };
+    el.addEventListener('click', handler);
+    el.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' ') handler(); }); }
+  selWatch('new'); selWatch('later');
+  on('confirmBtn', function(){
+    var ch = currentChoice(); if (ch==='none') return;
+    window.__p750_choice = ch;
+    var cp = dwellProps(); cp.choice=ch; cp.lang=document.documentElement.lang||'hi';
+    cp.lang_toggles=langToggles; cp.selection_changes=selectionChanges; cp.seconds=secs();
+    track(ch==='new'?'Confirmed':'Declined', cp);
+    if (ch==='new') postConsent('OPTED_IN', 1);
+    pauseAll(); contentOpen=false;
+  });
+  on('auditBtn', function(){ track('Progress', { milestone:'audit_action' }); });
+  on('endBtn', function(){ closeOut('completed'); });
+  on('okBtn',  function(){ closeOut('completed'); });
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState==='hidden'){ pageVis=false; pauseAll(); closeOut(window.__p750_choice?'left_after_confirm':'abandoned'); }
+    else { pageVis=true; resumeAll(); } });
+  window.addEventListener('pagehide', function(){ pageVis=false; pauseAll(); closeOut(window.__p750_choice?'left_after_confirm':'abandoned'); });
+  track('Viewed');
+})();
+</script>
+<!-- PAGE-2: open straight to content (skip the shared cover) -->
+<script>document.addEventListener('DOMContentLoaded',function(){var b=document.getElementById('coverBtn');if(b)b.click();});</script>

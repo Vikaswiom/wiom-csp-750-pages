@@ -825,7 +825,8 @@
     try{ if (window.CleverTap && typeof window.CleverTap.dismissInAppNotification === 'function'){ window.CleverTap.dismissInAppNotification(); return; } }catch(e){}
     try{ var wk = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap;
       if (wk){ wk.postMessage({ action:'dismissInAppNotification' }); return; } }catch(e){}
-    try{ history.back(); }catch(e){}
+    document.querySelectorAll('.donepage').forEach(p => p.classList.add('gone'));
+    document.body.classList.remove('locked');
   }
   document.getElementById('endBtn').addEventListener('click', () => {
     closeOut('completed');

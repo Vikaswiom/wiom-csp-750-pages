@@ -724,15 +724,23 @@
     document.body.classList.add('locked');
   });
 
-  // In the app this returns to the task list; standalone it just goes back if it can.
-  document.getElementById('endBtn').addEventListener('click', () => history.back());
+  function dismissOverlays(){
+    try{ if (window.CleverTap && typeof window.CleverTap.dismissInAppNotification === 'function'){ window.CleverTap.dismissInAppNotification(); return; } }catch(e){}
+    try{ var wk = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap;
+      if (wk){ wk.postMessage({ action:'dismissInAppNotification' }); return; } }catch(e){}
+    document.querySelectorAll('.donepage').forEach(p => p.classList.add('gone'));
+    document.body.classList.remove('locked');
+  }
+
+  // In the app this returns to the task list; standalone it dismisses the overlay.
+  document.getElementById('endBtn').addEventListener('click', () => dismissOverlays());
 
   // Flow 2: audit CTA leads to the thank-you page; ठीक है exits like endBtn.
   document.getElementById('auditBtn').addEventListener('click', () => {
     document.getElementById('auditPage').classList.add('gone');
     document.getElementById('thanksPage').classList.remove('gone');
   });
-  document.getElementById('okBtn').addEventListener('click', () => history.back());
+  document.getElementById('okBtn').addEventListener('click', () => dismissOverlays());
 
   render();
 </script>

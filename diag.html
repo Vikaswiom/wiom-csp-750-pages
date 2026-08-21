@@ -1,0 +1,228 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CSP 750 — WebView diagnostics</title>
+<style>
+  :root{ --brand-600:#D9008D; --brand-100:#FFE5F6; --brand-sec:#443152;
+         --n900:#161021; --n700:#665E75; --n300:#D7D3E0; --n100:#F4F2F8;
+         --ok:#1B7F4B; --ok-bg:#E4F5EC; --no:#B3261E; --no-bg:#FCEEED; --white:#fff; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; padding:16px 14px 40px; background:var(--white); color:var(--n900);
+        font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+        max-width:460px; margin:0 auto; }
+  h1{ font-size:19px; margin:0 0 2px; }
+  .sub{ color:var(--n700); font-size:13px; margin:0 0 16px; }
+  h2{ font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--n700);
+      margin:22px 0 8px; }
+  .row{ display:flex; justify-content:space-between; gap:10px; padding:8px 10px;
+        border:1px solid var(--n300); border-radius:9px; margin-bottom:6px; font-size:13px; }
+  .row b{ font-weight:700; }
+  .k{ color:var(--n700); flex:0 0 auto; }
+  .v{ text-align:right; word-break:break-all; font-weight:700; }
+  .yes{ color:var(--ok); } .nope{ color:var(--no); }
+  pre{ background:var(--n100); border:1px solid var(--n300); border-radius:9px;
+       padding:10px; font-size:12px; line-height:17px; overflow-x:auto; margin:0 0 6px;
+       white-space:pre-wrap; word-break:break-all; }
+  button{ font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+  .try{ display:block; width:100%; text-align:left; padding:12px 14px; margin-bottom:8px;
+        border:1px solid var(--n300); border-radius:11px; background:var(--white); color:var(--n900); }
+  .try small{ display:block; font-weight:400; color:var(--n700); font-size:12px; margin-top:3px;
+              word-break:break-all; }
+  .try.pending{ background:var(--brand-100); border-color:var(--brand-600); }
+  .try.hit{ background:var(--ok-bg); border-color:var(--ok); }
+  .try.miss{ background:var(--no-bg); border-color:var(--no); }
+  .verdict{ float:right; font-size:12px; font-weight:700; margin-left:8px; }
+  .copy{ width:100%; padding:14px; border:0; border-radius:12px;
+         background:var(--brand-600); color:var(--white); margin-top:10px; }
+  .note{ font-size:12px; line-height:18px; color:var(--n700); margin:10px 0 0; }
+</style>
+
+<h1>CSP 750 — WebView diagnostics</h1>
+<p class="sub">Open this <b>inside the Wiom app</b>, tap each route, then Copy report.</p>
+
+<h2>Environment</h2>
+<div id="env"></div>
+
+<h2>Native interfaces injected into this page</h2>
+<pre id="bridges">checking…</pre>
+<p class="note">Anything listed here is a bridge the app itself injected — that is what the
+hand-off should call. If this says <b>none</b>, the app exposes no JS bridge and a URL scheme
+is the only route.</p>
+
+<h2>Hand-off routes — tap each one</h2>
+<div id="tests"></div>
+<p class="note"><b>App took it</b> = the page went to the background within 2.5s, i.e. the app
+handled the route. <b>Nothing happened</b> = the route is not registered. Come back to this
+page after each tap.</p>
+
+<button class="copy" id="copyBtn">Copy report</button>
+<pre id="out" style="margin-top:12px">—</pre>
+
+<script>
+/* everything runs inside an IIFE: the bridge probe below diffs window
+   against a blank iframe, so this page must add no globals of its own. */
+(function(){
+var BUILD = 'diag-2';
+var log = [];
+
+/* ── environment ───────────────────────────────────────────────── */
+function esc(s){ return String(s).replace(/[<>&]/g, function(c){
+  return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c]; }); }
+function row(k, v, good){
+  var cls = good === true ? 'yes' : (good === false ? 'nope' : '');
+  return '<div class="row"><span class="k">' + esc(k) +
+         '</span><span class="v ' + cls + '">' + esc(v) + '</span></div>';
+}
+function has(fn){ try{ return !!fn(); }catch(e){ return false; } }
+
+var ctBridge  = has(function(){ return window.CleverTap && window.CleverTap.pushEvent; });
+var ctDismiss = has(function(){ return window.CleverTap && window.CleverTap.dismissInAppNotification; });
+var wkBridge  = has(function(){ return window.webkit.messageHandlers.clevertap; });
+var dvh = (function(){ try{ return CSS.supports('height','100dvh'); }catch(e){ return false; } })();
+
+var env = [
+  ['build', BUILD, null],
+  ['URL', location.href.length > 60 ? location.href.slice(0,60) + '…' : location.href, null],
+  ['viewport', window.innerWidth + ' × ' + window.innerHeight, null],
+  ['devicePixelRatio', window.devicePixelRatio || '?', null],
+  ['supports 100dvh', dvh ? 'yes' : 'NO', dvh],
+  ['CleverTap.pushEvent', ctBridge ? 'present' : 'absent', ctBridge],
+  ['CleverTap.dismissInApp', ctDismiss ? 'present' : 'absent', ctDismiss],
+  ['webkit.clevertap', wkBridge ? 'present' : 'absent', wkBridge]
+];
+document.getElementById('env').innerHTML = env.map(function(e){ return row(e[0], e[1], e[2]); }).join('');
+env.forEach(function(e){ log.push(e[0] + ': ' + e[1]); });
+log.push('userAgent: ' + navigator.userAgent);
+
+/* ── which native interfaces did the app inject? ───────────────────
+   Compare this window against a blank same-origin iframe: anything the
+   app added with addJavascriptInterface shows up as an extra key.      */
+(function(){
+  var out = 'none found';
+  try{
+    var f = document.createElement('iframe');
+    f.style.display = 'none';
+    document.body.appendChild(f);
+    var baseline = {}, k;
+    for (k in f.contentWindow) baseline[k] = 1;
+    var extra = [];
+    for (k in window){ if (!(k in baseline)) extra.push(k); }
+    document.body.removeChild(f);
+    /* drop the probe iframe's own window[0] and the webkit.* family */
+    extra = extra.filter(function(n){ return n.indexOf('webkit') !== 0 && !/^\d+$/.test(n); });
+    if (extra.length){
+      out = extra.map(function(n){
+        var t = 'unknown';
+        try{ t = typeof window[n]; }catch(e){}
+        var members = '';
+        if (t === 'object' || t === 'function'){
+          try{
+            var ms = [];
+            for (var m in window[n]) ms.push(m);
+            if (ms.length) members = '  { ' + ms.slice(0, 25).join(', ') + ' }';
+          }catch(e){}
+        }
+        return n + '  (' + t + ')' + members;
+      }).join('\n');
+    }
+  }catch(e){ out = 'probe failed: ' + e; }
+  document.getElementById('bridges').textContent = out;
+  log.push('--- injected interfaces ---');
+  log.push(out);
+})();
+
+/* ── hand-off route tests ──────────────────────────────────────── */
+var ROUTES = [
+  { id:'wiom_home',   label:'wiom://home',                 how:'href',   url:'wiom://home' },
+  { id:'wiom_root',   label:'wiom://',                     how:'href',   url:'wiom://' },
+  { id:'wiom_conn',   label:'wiom://home/strip/connections', how:'href', url:'wiom://home/strip/connections' },
+  { id:'wiom_iframe', label:'wiom://home  (via iframe)',   how:'iframe', url:'wiom://home' },
+  { id:'intent',      label:'intent://home  (Android)',    how:'href',
+    url:'intent://home#Intent;scheme=wiom;end' },
+  { id:'https_home',  label:'https://wiom.in/home  (App Link)', how:'href', url:'https://wiom.in/home' },
+  { id:'ct_dismiss',  label:'CleverTap.dismissInAppNotification()', how:'ct', url:'—' },
+  { id:'back',        label:'history.back()',              how:'back',   url:'—' }
+];
+
+var wrap = document.getElementById('tests');
+wrap.innerHTML = ROUTES.map(function(r){
+  return '<button class="try" id="t_' + r.id + '">' +
+         '<span class="verdict" id="v_' + r.id + '">not tried</span>' +
+         esc(r.label) + '<small>' + esc(r.url) + '</small></button>';
+}).join('');
+
+var armed = null, wentAway = false;
+function away(){
+  wentAway = true;
+  if (armed) settle(armed, true);
+}
+document.addEventListener('visibilitychange', function(){ if (document.hidden) away(); });
+window.addEventListener('pagehide', away);
+window.addEventListener('blur', away);
+
+function settle(r, hit){
+  if (!r.pending) return;          /* each route settles on its own, even if
+                                      another was tapped while it was watching */
+  r.pending = false;
+  if (armed === r) armed = null;
+  var btn = document.getElementById('t_' + r.id);
+  var v   = document.getElementById('v_' + r.id);
+  btn.className = 'try ' + (hit ? 'hit' : 'miss');
+  v.textContent = hit ? 'APP TOOK IT' : 'nothing happened';
+  log.push('route ' + r.label + ' -> ' + (hit ? 'HANDLED' : 'not handled'));
+  render();
+}
+
+function fire(r){
+  wentAway = false;
+  armed = r;
+  r.pending = true;
+  var btn = document.getElementById('t_' + r.id);
+  btn.className = 'try pending';
+  document.getElementById('v_' + r.id).textContent = 'watching…';
+
+  try{
+    if (r.how === 'href'){ location.href = r.url; }
+    else if (r.how === 'iframe'){
+      var f = document.createElement('iframe');
+      f.style.display = 'none'; f.src = r.url;
+      document.body.appendChild(f);
+    }
+    else if (r.how === 'ct'){
+      var done = false;
+      try{ if (window.CleverTap && window.CleverTap.dismissInAppNotification){
+        window.CleverTap.dismissInAppNotification(); done = true; } }catch(e){}
+      try{ if (!done && window.webkit && window.webkit.messageHandlers &&
+        window.webkit.messageHandlers.clevertap){
+          window.webkit.messageHandlers.clevertap.postMessage(
+            { action:'dismissInAppNotification' }); done = true; } }catch(e){}
+      if (!done){ setTimeout(function(){ settle(r, false); }, 300); return; }
+    }
+    else if (r.how === 'back'){ history.back(); }
+  }catch(e){
+    log.push('route ' + r.label + ' threw: ' + e);
+  }
+  setTimeout(function(){ if (!wentAway) settle(r, false); }, 2500);
+}
+
+ROUTES.forEach(function(r){
+  document.getElementById('t_' + r.id).addEventListener('click', function(){ fire(r); });
+});
+
+/* ── report ────────────────────────────────────────────────────── */
+function render(){ document.getElementById('out').textContent = log.join('\n'); }
+render();
+document.getElementById('copyBtn').addEventListener('click', function(){
+  var t = log.join('\n');
+  var ok = false;
+  try{ if (navigator.clipboard){ navigator.clipboard.writeText(t); ok = true; } }catch(e){}
+  if (!ok){
+    var ta = document.createElement('textarea');
+    ta.value = t; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); ok = true; }catch(e){}
+    document.body.removeChild(ta);
+  }
+  this.textContent = ok ? 'Copied ✓' : 'Select the text below and copy';
+});
+})();
+</script>

@@ -982,16 +982,17 @@
 </script>
 
 <script>
-/* ── "सारे काम देखें" hands the CSP back to the app's home screen ──
-   wiom://home is the app's own deep-link route (csp-os-yaml visual-spec:
-   wiom://home/strip/..., wiom://home/task/{id}). The earlier Wiom in-app
-   campaign recorded location_href as the hand-off that actually ran in
-   production (DeepLink_Attempt.mechanism, 229/229), so that is the primary.
-   A hidden iframe is tried first because an unhandled scheme there fails
-   silently, where location.href would throw the WebView onto an error page.
-   If the app never takes the hand-off, close the CleverTap in-app instead. */
+/* ── "सारे काम देखें" hands the CSP over to the connections screen ──
+   Confirmed target: an ordinary https URL on the CSP web app, not a custom
+   scheme — so a plain navigation is all it takes, and the hidden-iframe
+   trick that a wiom:// scheme would have needed is wrong here (an https URL
+   would just load inside the hidden frame and go nowhere).
+   When this page runs inside the CleverTap cover's iframe we navigate the
+   top window instead, so the CSP lands on the page rather than seeing it
+   trapped in the in-app frame. If nothing moves within 1.5s, fall back to
+   closing the CleverTap in-app the way this button always did. */
 (function(){
-  var APP_HOME = "wiom://home";   /* ← change here if the app expects another route */
+  var APP_HOME = "https://csp.wiom.in/assurance/connections";   /* ← the deep link */
   var left = false;
   function gone(){ left = true; }
   document.addEventListener("visibilitychange", function(){ if (document.hidden) gone(); });
@@ -1006,15 +1007,20 @@
   }
 
   function goHome(){
-    var mech = "none";
+    var how = "self";
+    try{ track("Progress", { milestone:"app_home", target:APP_HOME }); }catch(e){}
+    /* framed by the CleverTap cover? take the whole WebView with us */
     try{
-      var f = document.createElement("iframe");
-      f.style.cssText = "display:none"; f.src = APP_HOME;
-      document.body.appendChild(f); mech = "iframe";
-    }catch(e){}
-    try{ track("Progress", { milestone:"app_home", mechanism:mech, target:APP_HOME }); }catch(e){}
-    setTimeout(function(){ if (!left){ try{ location.href = APP_HOME; }catch(e){} } }, 150);
-    setTimeout(function(){ if (!left) ctDismiss(); }, 1200);
+      if (window.top && window.top !== window.self){
+        window.top.location.href = APP_HOME; how = "top";
+      }
+    }catch(e){ how = "self"; }
+    if (how === "self"){
+      try{ location.href = APP_HOME; }
+      catch(e){ try{ location.replace(APP_HOME); }catch(e2){} }
+    }
+    /* last resort: if the WebView refused to navigate, close the in-app */
+    setTimeout(function(){ if (!left && location.href.indexOf("csp.wiom.in") < 0) ctDismiss(); }, 1500);
   }
 
   function bind(id){ var el = document.getElementById(id); if (el) el.addEventListener("click", goHome); }

@@ -958,3 +958,45 @@
   } else { start(); }
 })();
 </script>
+
+<script>
+/* ── "सारे काम देखें" hands the CSP back to the app's home screen ──
+   wiom://home is the app's own deep-link route (csp-os-yaml visual-spec:
+   wiom://home/strip/..., wiom://home/task/{id}). The earlier Wiom in-app
+   campaign recorded location_href as the hand-off that actually ran in
+   production (DeepLink_Attempt.mechanism, 229/229), so that is the primary.
+   A hidden iframe is tried first because an unhandled scheme there fails
+   silently, where location.href would throw the WebView onto an error page.
+   If the app never takes the hand-off, close the CleverTap in-app instead. */
+(function(){
+  var APP_HOME = "wiom://home";   /* ← change here if the app expects another route */
+  var left = false;
+  function gone(){ left = true; }
+  document.addEventListener("visibilitychange", function(){ if (document.hidden) gone(); });
+  window.addEventListener("pagehide", gone);
+
+  function ctDismiss(){
+    try{ if (window.CleverTap && typeof window.CleverTap.dismissInAppNotification === "function"){
+      window.CleverTap.dismissInAppNotification(); return true; } }catch(e){}
+    try{ var wk = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap;
+      if (wk){ wk.postMessage({ action:"dismissInAppNotification" }); return true; } }catch(e){}
+    return false;
+  }
+
+  function goHome(){
+    var mech = "none";
+    try{
+      var f = document.createElement("iframe");
+      f.style.cssText = "display:none"; f.src = APP_HOME;
+      document.body.appendChild(f); mech = "iframe";
+    }catch(e){}
+    try{ track("Progress", { milestone:"app_home", mechanism:mech, target:APP_HOME }); }catch(e){}
+    setTimeout(function(){ if (!left){ try{ location.href = APP_HOME; }catch(e){} } }, 150);
+    setTimeout(function(){ if (!left) ctDismiss(); }, 1200);
+  }
+
+  function bind(id){ var el = document.getElementById(id); if (el) el.addEventListener("click", goHome); }
+  bind("endBtn");   /* flow1 confirmation, flow2/3 confirmation */
+  bind("okBtn");    /* flow2/3 thank-you page */
+})();
+</script>

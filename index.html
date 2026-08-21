@@ -27,10 +27,28 @@
     font-size: 16px;
   }
   a:hover { background: #FFCCED; }
+  .idbox {
+    margin: 20px 0 4px; padding: 14px 16px;
+    background: #F4F2F8; border: 1px solid #E8E4F0; border-radius: 12px;
+  }
+  .idbox label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .idbox input {
+    width: 100%; box-sizing: border-box; padding: 10px 12px;
+    border: 1px solid #D7D3E0; border-radius: 8px;
+    font-family: inherit; font-size: 15px;
+  }
+  .idbox small { display: block; margin-top: 8px; color: #665E75; font-size: 12px; line-height: 17px; }
 </style>
 </head>
 <body>
   <h1>CSP 750 - Payout Flows</h1>
+
+  <div class="idbox">
+    <label for="cspid">CSP ID</label>
+    <input id="cspid" type="text" placeholder="e.g. a0a0b1" autocomplete="off" spellcheck="false">
+    <small>Appended to every link below as <code>?cspId=</code>. Leave it blank to see the
+    link guard &mdash; without a CSP ID the flows refuse to open.</small>
+  </div>
 
   <h2 style="font-size:18px;margin-top:28px;">Production</h2>
   <p>API: csp-api.i2e1.in</p>
@@ -43,5 +61,22 @@
   <a href="qa-flow1.html" style="background:#E4F5EC;border-color:#B8E6CC;color:#1B7F4B;">Flow 1 (QA)</a>
   <a href="qa-flow2.html" style="background:#E4F5EC;border-color:#B8E6CC;color:#1B7F4B;">Flow 2 (QA)</a>
   <a href="qa-flow3.html" style="background:#E4F5EC;border-color:#B8E6CC;color:#1B7F4B;">Flow 3 (QA)</a>
+<script>
+/* Keep the menu usable now that the flows refuse to open without a CSP ID:
+   whatever is typed above rides along as ?cspId= on every link. */
+(function(){
+  var input = document.getElementById('cspid');
+  var links = [].slice.call(document.querySelectorAll('a[href$=".html"]'));
+  var base  = links.map(function(a){ return a.getAttribute('href').split('?')[0]; });
+  function sync(){
+    var id = input.value.replace(/^\s+|\s+$/g, '');
+    links.forEach(function(a, i){
+      a.setAttribute('href', id ? base[i] + '?cspId=' + encodeURIComponent(id) : base[i]);
+    });
+  }
+  input.addEventListener('input', sync);
+  sync();
+})();
+</script>
 </body>
 </html>

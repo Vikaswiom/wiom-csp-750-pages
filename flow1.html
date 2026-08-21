@@ -326,6 +326,25 @@
   .gate .gh{ font-size:20px; line-height:28px; font-weight:700; margin:0; max-width:22ch; }
   .gate .gp{ font-size:15px; line-height:22px; color:rgba(255,255,255,.85); margin:0; max-width:30ch; }
   .gate .gp.en{ font-size:13px; line-height:19px; color:rgba(255,255,255,.6); }
+
+  /* ── Confirmation REPLACES the flow instead of floating over it ──
+     Some Android WebViews neither resolve the height of a fixed, transformed
+     overlay nor repaint its background reliably, which left the confirmation
+     half-drawn on top of the content. Once the flow itself is removed from the
+     page there is no overlay left to fail: the confirmation is the only thing
+     rendered, in normal flow. Driven by the class-sync script at the end. */
+  html.done .togglerow,
+  html.done .content,
+  html.done .decisionbar,
+  html.done .cover{ display:none !important; }
+  html.done body{ overflow:visible !important; }
+  html.done .donepage{
+    position:static; transform:none;
+    top:auto; bottom:auto; left:auto;
+    width:auto; max-width:420px; margin:0 auto;
+    min-height:100vh; border-radius:0;
+  }
+  html.done .dbody{ overflow:visible; }
 </style>
 
 <script>
@@ -904,3 +923,39 @@
 </script>
 <!-- PAGE-2: open straight to content (skip the shared cover) -->
 <script>document.addEventListener('DOMContentLoaded',function(){var b=document.getElementById('coverBtn');if(b)b.click();});</script>
+
+<script>
+/* Mirrors "is any .donepage visible?" onto <html class="done">, which lets the
+   CSS above take the flow off the page while a confirmation is showing. Watching
+   the class attribute means every existing show/hide call site keeps working
+   untouched — flow1 donePage, flow2/3 auditPage and thanksPage alike. */
+(function(){
+  var root = document.documentElement;
+  function anyOpen(){
+    var all = document.getElementsByClassName("donepage");
+    for (var i = 0; i < all.length; i++){
+      if ((" " + all[i].className + " ").indexOf(" gone ") < 0) return true;
+    }
+    return false;
+  }
+  function sync(){
+    var open = anyOpen(), on = (" " + root.className + " ").indexOf(" done ") >= 0;
+    if (open === on) return;
+    root.className = open ? (root.className + " done")
+                          : root.className.replace(/(^|\s)done(?=\s|$)/g, "");
+    if (open){ try{ window.scrollTo(0, 0); }catch(e){} }
+  }
+  function start(){
+    if (window.MutationObserver){
+      new MutationObserver(sync).observe(document.documentElement,
+        { subtree:true, attributes:true, attributeFilter:["class"] });
+    } else {
+      setInterval(sync, 200);   /* pre-KitKat WebViews */
+    }
+    sync();
+  }
+  if (document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", start);
+  } else { start(); }
+})();
+</script>

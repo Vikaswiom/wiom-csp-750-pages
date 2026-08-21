@@ -239,14 +239,14 @@
     width:100%; max-width:420px; height:100%; height:100dvh; z-index:30;
     background:var(--white); color:var(--n900);
     display:flex; flex-direction:column;
-    transition:opacity .35s, visibility .35s;
   }
   @media (min-width:480px){
     .donepage{ top:24px; bottom:24px; height:auto; border-radius:24px; overflow:hidden; }
   }
-  .donepage.gone{ opacity:0; visibility:hidden; pointer-events:none; }
+  .donepage.gone{ display:none; }
   .dbody{
-    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center; gap:14px; padding:24px 28px;
   }
   .dbody .icircle{ width:64px; height:64px; font-size:30px; font-weight:700; }
@@ -272,12 +272,11 @@
     background:var(--brand-sec); color:var(--white);
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center; gap:14px; padding:32px 28px;
-    transition:opacity .35s, visibility .35s;
   }
   @media (min-width:480px){
     .cover{ top:24px; bottom:24px; border-radius:24px; }
   }
-  .cover.gone{ opacity:0; visibility:hidden; pointer-events:none; }
+  .cover.gone{ display:none; }
   .cover .clang{ position:absolute; top:16px; right:16px; margin-left:0; }
   .cover .ceyebrow{
     font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase;
@@ -309,7 +308,73 @@
     *{ transition:none !important; scroll-behavior:auto !important; }
   }
   .cover{ display:none !important; }
+
+  /* ── Link guard: the page must not open without a CSP ID in the URL ── */
+  .gate{
+    position:fixed; top:0; bottom:0; left:50%; transform:translateX(-50%);
+    width:100%; max-width:420px; z-index:200;
+    background:var(--brand-sec); color:var(--white);
+    display:none; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap:12px; padding:32px 28px;
+  }
+  html.nocsp .gate{ display:flex; }
+  html.nocsp .phone{ display:none; }
+  .gate .gicon{
+    width:64px; height:64px; border-radius:50%; background:rgba(255,255,255,.1);
+    color:var(--brand-300); display:flex; align-items:center; justify-content:center;
+  }
+  .gate .gh{ font-size:20px; line-height:28px; font-weight:700; margin:0; max-width:22ch; }
+  .gate .gp{ font-size:15px; line-height:22px; color:rgba(255,255,255,.85); margin:0; max-width:30ch; }
+  .gate .gp.en{ font-size:13px; line-height:19px; color:rgba(255,255,255,.6); }
 </style>
+
+<script>
+/* ══════════════ LINK GUARD ══════════════════════════════════════════════
+   No CSP ID in the URL → the page does not open. Runs before any content is
+   parsed, so nothing paints behind the notice. Tolerant about the parameter
+   name (cspId / csp_id / csp-id / cspid / csp) and reads query or hash.
+   A missing id is reported as Payout750_Closed{exit:"no_csp_id"} so a broken
+   personalisation token shows up in CleverTap instead of failing silently. */
+(function(){
+  function scan(s){
+    var out = "", m, re = /[?&#]([a-zA-Z_\-]+)=([^&#]*)/g;
+    while ((m = re.exec(s))){
+      var k = m[1].toLowerCase().replace(/[_\-]/g, "");
+      if ((k === "cspid" || k === "csp") && !out){
+        try{ out = decodeURIComponent(m[2]); }catch(e){ out = m[2]; }
+      }
+    }
+    return out;
+  }
+  var id = String(window.CSP_ID || scan(location.search) || scan(location.hash) || "")
+             .replace(/^\s+|\s+$/g, "");
+  if (id && id.toLowerCase() !== "default" && id.indexOf("{") < 0){ window.__P750_ID = id; return; }
+  document.documentElement.className += " nocsp";
+  var p = { exit:"no_csp_id", flow:2, id_seen:(id || "none") };
+  var n = 0;
+  (function push(){
+    n++;
+    try{ if (window.CleverTap && typeof window.CleverTap.pushEvent === "function"){
+      window.CleverTap.pushEvent("Payout750_Closed", JSON.stringify(p)); return; } }catch(e){}
+    try{ var wk = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap;
+      if (wk){ wk.postMessage({ action:"recordEventWithProps", event:"Payout750_Closed", properties:p }); return; } }catch(e){}
+    if (n < 6) setTimeout(push, 250 * n);
+  })();
+})();
+</script>
+
+<div class="gate" id="gate" role="alert">
+  <span class="gicon" aria-hidden="true">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+      <path d="m2 2 20 20"/>
+    </svg>
+  </span>
+  <p class="gh">लिंक अधूरा है</p>
+  <p class="gp">यह पेज आपके CSP ID के बिना नहीं खुल सकता। कृपया Wiom ऐप में दिए गए लिंक से ही इसे खोलें।</p>
+  <p class="gp en">This page cannot open without your CSP ID. Please open it from the link inside the Wiom app.</p>
+</div>
 
 <div class="phone">
   <span id="cspidTok" style="display:none">{{ Profile.cspid | default: "" }}</span>
@@ -802,7 +867,7 @@
   var apiStatus='idle', apiErr='', apiHttp=0;
   function qp(n){ try{ return new URLSearchParams(location.search).get(n)||''; }catch(e){ return ''; } }
   function cspId(){ var el=document.getElementById('cspidTok'); var v=el?(el.textContent||'').trim():'';
-    if (v && v.indexOf('{')<0) return v; return window.CSP_ID || CSP_ID_FIXED || qp('cspId') || qp('csp_id') || ''; }
+    if (v && v.indexOf('{')<0) return v; return window.__P750_ID || window.CSP_ID || CSP_ID_FIXED || qp('cspId') || qp('csp_id') || ''; }
   function cspJwt(){ return window.CSP_JWT || qp('token') || qp('jwt') || ''; }
   function postConsent(consent, attempt){
     var id=cspId(); if(!id){ apiStatus='skipped'; apiErr='no_csp_id'; return; }

@@ -72,7 +72,14 @@
   .langtoggle:focus-visible{ outline:2px solid var(--brand-300); outline-offset:2px; }
 
   .content{ padding:8px 20px 32px; }
-  .togglerow{ display:flex; justify-content:flex-end; padding:14px 16px 0; }
+  .togglerow{ display:flex; justify-content:flex-end; align-items:center; gap:8px; padding:14px 16px 0; }
+  /* FAQ shortcut — sits immediately left of the language toggle */
+  .faqcta{
+    border:1px solid var(--brand-200); background:var(--brand-100); color:var(--brand-600);
+    border-radius:999px; font-family:inherit; font-size:13px; font-weight:700;
+    padding:6px 14px; cursor:pointer; white-space:nowrap;
+  }
+  .faqcta:focus-visible{ outline:2px solid var(--brand-300); outline-offset:2px; }
   .togglerow .langtoggle{ border:1px solid var(--n300); background:var(--n100); color:var(--n800); }
   section{ padding:36px 0; }
   section + section{ border-top:1px solid var(--n100); }
@@ -411,6 +418,7 @@
   </div>
 
   <div class="togglerow">
+    <button class="faqcta" id="faqBtn" data-i18n="faqCta">जरूरी सवालों के जवाब</button>
     <button class="langtoggle" id="langToggle" aria-label="Switch language">English</button>
   </div>
 
@@ -581,6 +589,7 @@
     hi: {
       appTitle: 'पेआउट का तरीका',
       toggle: 'English',
+      faqCta: 'जरूरी सवालों के जवाब',
       eyebrow: 'नए कनेक्शन पर',
       heroSub: 'एक साथ, शुरू में ही',
       heroLine: 'यह पहले 3 महीने का पेआउट है — हर नए कनेक्शन पर।',
@@ -631,6 +640,7 @@
     en: {
       appTitle: 'Payout Structure',
       toggle: 'हिंदी',
+      faqCta: 'Key questions answered',
       eyebrow: 'On every new connection',
       heroSub: 'in one go, right at the start',
       heroLine: 'This is the payout for the first 3 months — on every new connection.',
@@ -1005,4 +1015,21 @@
   bind("endBtn");   /* flow1 confirmation, flow2/3 confirmation */
   bind("okBtn");    /* flow2/3 thank-you page */
 })();
+
+  /* ── FAQ shortcut ──────────────────────────────────────────────
+     Opens the companion sawaal-jawaab page in this same frame, carrying the
+     CSP ID (the FAQ's own "offer" CTA needs it to come back here) and the
+     current language. The FAQ's back arrow returns to this page. */
+  (function(){
+    var b = document.getElementById('faqBtn');
+    if (!b) return;
+    b.addEventListener('click', function(){
+      var id = '';
+      try { id = cspId(); } catch (e) {}
+      var url = 'faq.html?cspId=' + encodeURIComponent(id || '')
+              + '&lang=' + (typeof lang !== 'undefined' ? lang : 'hi');
+      try { track('Progress', { milestone: 'faq_opened' }); } catch (e) {}
+      setTimeout(function(){ location.href = url; }, 120);
+    });
+  })();
 </script>

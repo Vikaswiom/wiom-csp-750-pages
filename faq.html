@@ -1,0 +1,1193 @@
+<!doctype html>
+<html lang="hi">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- ================================================================
+     CSP ₹750 PAYOUT — SAWAAL-JAWAAB (FAQ)
+     Companion to flow1.html (the opt-in page). Same visual family:
+     brand-sec appbar, 420px phone frame, brand-600 accents.
+
+     Content model lives in the FAQ constant at the bottom of the file:
+     every question carries hi/en strings and a status. Questions with
+     status 'pending' are HIDDEN from CSPs and shown only in review
+     mode (?review=1) with the open question that still needs a ruling.
+================================================================ -->
+<title>CSP ₹750 सवाल-जवाब</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans:wght@400;600;700&display=swap">
+<style>
+  :root{
+    color-scheme: light;   /* the page commits to the app's light world */
+    --brand-600:#D9008D;
+    --brand-300:#FFB2E4;
+    --brand-200:#FFCCED;
+    --brand-100:#FFE5F6;
+    --brand-sec:#443152;
+    --n900:#161021;
+    --n800:#352D42;
+    --n700:#665E75;
+    --n500:#A7A1B2;
+    --n300:#D7D3E0;
+    --n200:#E8E4F0;
+    --n100:#F4F2F8;
+    --white:#FFFFFF;
+    --positive:#1B7F4B;
+    --positive-bg:#E4F5EC;
+    --caution:#806000;
+    --caution-bg:#FFF2BF;
+    --page-bg:#FFFFFF;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--page-bg);
+    font-family:"Noto Sans Devanagari","Noto Sans",-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Devanagari MT", sans-serif;
+    color:var(--n900);
+    -webkit-font-smoothing:antialiased;
+  }
+  .phone{
+    max-width:420px; margin:0 auto;
+    background:var(--white); min-height:100vh;
+    box-shadow:0 0 40px rgba(22,16,33,.18);
+    position:relative;
+  }
+  @media (min-width:480px){
+    body{ background:var(--n200); }
+    .phone{ margin:24px auto 40px; border-radius:24px; overflow:hidden; min-height:0; }
+  }
+
+  /* ── App bar ─────────────────────────────────────────── */
+  .appbar{
+    background:var(--brand-sec); color:var(--white);
+    padding:14px 16px; display:flex; align-items:center; gap:12px;
+    position:sticky; top:0; z-index:20;
+  }
+  .appbar .back{ font-size:20px; line-height:1; opacity:.9; text-decoration:none; color:inherit; }
+  .appbar .title{ font-size:16px; font-weight:700; }
+  .langtoggle{
+    margin-left:auto;
+    border:1px solid rgba(255,255,255,.4); background:rgba(255,255,255,.08);
+    color:var(--white); border-radius:999px;
+    font-family:inherit; font-size:13px; font-weight:700;
+    padding:6px 14px; cursor:pointer;
+  }
+  .langtoggle:focus-visible{ outline:2px solid var(--brand-300); outline-offset:2px; }
+
+  .content{ padding:0 20px 28px; }
+
+  /* ── Intro ───────────────────────────────────────────── */
+  .intro{ padding:24px 0 4px; }
+  .intro h1{ font-size:22px; line-height:30px; font-weight:700; margin:0 0 6px; text-wrap:balance; }
+  .intro p{ font-size:15px; line-height:22px; color:var(--n700); margin:0; }
+
+  /* ── Recap card: the offer in three rows ─────────────── */
+  .recap{
+    margin:20px 0 0; border:1px solid var(--brand-200); background:var(--brand-100);
+    border-radius:16px; padding:16px;
+  }
+  .recap h2{
+    font-size:12px; font-weight:700; letter-spacing:.8px; text-transform:uppercase;
+    color:var(--brand-600); margin:0 0 12px;
+  }
+  .rrow{ display:flex; gap:12px; align-items:flex-start; }
+  .rrow + .rrow{ margin-top:12px; padding-top:12px; border-top:1px solid var(--brand-200); }
+  .rnum{
+    width:26px; height:26px; border-radius:50%; flex-shrink:0;
+    background:var(--brand-600); color:var(--white);
+    font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center;
+    font-variant-numeric:tabular-nums;
+  }
+  .rtext{ flex:1; }
+  .rtext .rt{ margin:0; font-size:15px; line-height:21px; font-weight:700; }
+  .rtext .rs{ margin:2px 0 0; font-size:13px; line-height:19px; color:var(--n800); }
+  .rtext b{ color:var(--brand-600); }
+
+
+  /* ── Most-asked strip ────────────────────────────────── */
+  .blockh{
+    font-size:12px; font-weight:700; letter-spacing:.8px; text-transform:uppercase;
+    color:var(--n700); margin:0 0 12px;
+  }
+
+  /* ── Category sections ───────────────────────────────── */
+  .cat{ margin:32px 0 0; scroll-margin-top:64px; }
+  .cathead{ display:flex; gap:12px; align-items:center; margin:0 0 14px; }
+  .icircle{
+    width:40px; height:40px; border-radius:50%;
+    background:var(--brand-100); color:var(--brand-600);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .icircle svg{ display:block; }
+  .cathead h2{ font-size:17px; line-height:24px; font-weight:700; margin:0; }
+  .cathead p{ font-size:13px; line-height:18px; color:var(--n700); margin:2px 0 0; }
+
+  .qlist{ display:flex; flex-direction:column; gap:8px; }
+  .qitem{
+    border:1px solid var(--n200); border-radius:12px; overflow:hidden;
+    background:var(--white); scroll-margin-top:64px;
+  }
+  .qitem.open{ border-color:var(--brand-200); }
+  .qbtn{
+    width:100%; text-align:left; font-family:inherit; cursor:pointer;
+    border:0; background:transparent;
+    padding:14px 14px; display:flex; gap:10px; align-items:flex-start;
+    font-size:15px; line-height:21px; font-weight:700; color:var(--n900);
+  }
+  .qbtn:focus-visible{ outline:3px solid var(--brand-300); outline-offset:-3px; }
+  .qbtn .qtext{ flex:1; }
+  .chev{
+    flex-shrink:0; color:var(--n500); margin-top:2px;
+    transition:transform .18s ease;
+  }
+  .qitem.open .chev{ transform:rotate(180deg); color:var(--brand-600); }
+  .qans{
+    display:none; padding:0 14px 16px; margin-top:-2px;
+  }
+  .qitem.open .qans{ display:block; }
+  .qans p{ margin:0; font-size:14px; line-height:21px; color:var(--n800); }
+  .qans p + p{ margin-top:8px; }
+  .qans b{ font-weight:700; color:var(--brand-600); }
+  .qans .plain b{ color:inherit; }
+
+  /* the CSP's own words, quoted back above the answer */
+  .said{
+    margin:0 0 10px; padding:10px 12px;
+    background:var(--n100); border-radius:10px;
+    border-left:3px solid var(--n300);
+    font-size:13px; line-height:19px; color:var(--n700); font-style:normal;
+  }
+
+  /* a small money table inside an answer */
+  .mini{ margin:10px 0 0; border:1px solid var(--n200); border-radius:10px; overflow:hidden; }
+  .mini div{ display:flex; align-items:center; gap:10px; padding:10px 12px; font-size:13px; line-height:19px; }
+  .mini div + div{ border-top:1px solid var(--n200); }
+  .mini .lab{ flex:1; color:var(--n800); }
+  .mini .val{ font-weight:700; color:var(--n900); font-variant-numeric:tabular-nums; flex-shrink:0; }
+  .mini .val.pink{ color:var(--brand-600); }
+  .mini .tot{ background:var(--n100); }
+
+  /* callout inside an answer */
+  .note{
+    margin:10px 0 0; padding:11px 12px; border-radius:10px;
+    background:var(--brand-100); border:1px solid var(--brand-200);
+    font-size:13px; line-height:19px; color:var(--n800);
+  }
+  .note.calm{ background:var(--n100); border-color:var(--n200); }
+
+  /* ── Pending (review-mode only) ──────────────────────── */
+  .qitem.pending{ display:none; }
+  .review .qitem.pending{ display:block; border-color:#E8D48A; background:#FFFDF4; }
+  .review .qitem.pending .qbtn{ color:var(--caution); }
+  .pendbadge{
+    display:inline-block; margin:0 0 8px;
+    background:var(--caution-bg); color:var(--caution);
+    font-size:11px; font-weight:700; letter-spacing:.4px;
+    border-radius:4px; padding:3px 8px;
+  }
+  .askline{
+    margin:8px 0 0; padding:10px 12px; border-radius:10px;
+    background:var(--white); border:1px dashed #E8D48A;
+    font-size:13px; line-height:19px; color:var(--n800);
+  }
+  .askline b{ color:var(--caution); }
+  .reviewbar{
+    display:none; background:var(--caution-bg); color:var(--caution);
+    padding:10px 20px; font-size:13px; line-height:19px; font-weight:700;
+  }
+  .review .reviewbar{ display:block; }
+
+  /* ── Inline CTA inside answer ────────────────────────── */
+  .ans-cta{
+    display:block; width:100%; border:0; border-radius:12px;
+    padding:14px 16px; margin:12px 0 0;
+    background:var(--brand-600); color:var(--white);
+    font-family:inherit; font-size:15px; font-weight:700;
+    text-align:center; text-decoration:none; cursor:pointer;
+  }
+  .ans-cta:active{ opacity:.9; }
+  .ans-cta:focus-visible{ outline:3px solid var(--brand-300); outline-offset:2px; }
+
+  /* ── Talk to us ──────────────────────────────────────── */
+  .helpcard{
+    margin:32px 0 0; border:1px solid var(--n200); border-radius:16px;
+    padding:18px 16px; text-align:center;
+  }
+  .helpcard .icircle{ margin:0 auto 10px; width:48px; height:48px; }
+  .helpcard h2{ font-size:16px; line-height:23px; font-weight:700; margin:0 0 4px; }
+  .helpcard p{ font-size:14px; line-height:20px; color:var(--n700); margin:0 0 14px; max-width:30ch; margin-left:auto; margin-right:auto; }
+  .linkcta{
+    display:inline-block; border:0; background:transparent;
+    font-family:inherit; font-size:16px; font-weight:700; line-height:24px;
+    color:var(--brand-600); padding:12px 16px; cursor:pointer;
+    text-decoration:none;
+  }
+  .linkcta:focus-visible{ outline:3px solid var(--brand-300); outline-offset:2px; border-radius:8px; }
+
+  /* ── Sticky CTA ──────────────────────────────────────── */
+  .ctabar{
+    position:sticky; bottom:0; z-index:15;
+    background:var(--white); border-top:1px solid var(--n200);
+    padding:12px 20px calc(12px + env(safe-area-inset-bottom));
+    box-shadow:0 -4px 16px rgba(22,16,33,.08);
+  }
+  .cta{
+    display:block; width:100%; border:0; border-radius:14px;
+    padding:16px; font-size:16px; font-weight:700; font-family:inherit;
+    background:var(--brand-600); color:var(--white); cursor:pointer;
+    text-align:center; text-decoration:none;
+  }
+  .cta:active{ transform:scale(.99); }
+  .cta:focus-visible{ outline:3px solid var(--brand-300); outline-offset:2px; }
+
+  .footnote{
+    padding:18px 20px 4px; font-size:12px; line-height:18px;
+    color:var(--n500); text-align:center;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; scroll-behavior:auto !important; }
+  }
+</style>
+
+<div class="phone">
+
+  <div class="appbar">
+    <a class="back" id="backBtn" href="#" aria-label="वापस">&#8592;</a>
+    <span class="title" data-s="appTitle">सवाल-जवाब</span>
+    <button class="langtoggle" id="langToggle" data-s="toggle">English</button>
+  </div>
+
+  <div class="reviewbar" data-s="reviewBar"></div>
+
+  <div class="content">
+
+    <div class="intro">
+      <h1 data-s="h1"></h1>
+      <p data-s="lede"></p>
+    </div>
+
+    <!-- The offer in three rows. 49 CSPs said they never understood it,
+         so the recap comes before any question. -->
+    <div class="recap">
+      <h2 data-s="recapH"></h2>
+      <div class="rrow">
+        <span class="rnum">1</span>
+        <div class="rtext">
+          <p class="rt" data-s="r1t"></p>
+          <p class="rs" data-s="r1s"></p>
+        </div>
+      </div>
+      <div class="rrow">
+        <span class="rnum">2</span>
+        <div class="rtext">
+          <p class="rt" data-s="r2t"></p>
+          <p class="rs" data-s="r2s"></p>
+        </div>
+      </div>
+      <div class="rrow">
+        <span class="rnum">3</span>
+        <div class="rtext">
+          <p class="rt" data-s="r3t"></p>
+          <p class="rs" data-s="r3s"></p>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="cats"></div>
+
+    <div class="helpcard">
+      <div class="icircle">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6.5 3.5h3l1.5 4-2 1.5a11 11 0 0 0 6 6l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7 2 2 0 0 1 6.5 3.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 data-s="helpH"></h2>
+      <p data-s="helpP"></p>
+      <a class="linkcta" id="callCta" href="#" data-s="helpCta"></a>
+    </div>
+
+    <p class="footnote" data-s="foot"></p>
+
+  </div>
+
+  <div class="ctabar">
+    <a class="cta" id="offerCta" href="#" data-s="offerCta"></a>
+  </div>
+
+</div>
+
+<script>
+/* ── Page chrome strings. Question content lives in FAQ below. ── */
+var S = {
+  hi: {
+    docTitle : '₹750 वाले तरीके के सवाल-जवाब',
+    appTitle : 'सवाल-जवाब',
+    toggle   : 'English',
+    h1       : '₹750 वाला तरीका — आपके सवाल',
+    lede     : 'जो सवाल साथी CSP सबसे ज़्यादा पूछते हैं, उनके जवाब यहाँ हैं।',
+
+    recapH   : 'तरीका एक नज़र में',
+    r1t      : 'शुरू में ₹750, एक साथ',
+    r1s      : 'हर नए कनेक्शन पर, दिन 0 को ही।',
+    r2t      : '3 महीने का ISP रिचार्ज + प्रूफ़',
+    r2s      : 'शुरू में एक बार। पहले 3 महीने की सर्विस आपकी ज़िम्मेदारी।',
+    r3t      : 'महीना 4 से ₹300 हर रिन्यूअल पर',
+    r3s      : 'जब भी 1 महीने का रिन्यूअल टिकट बनेगा।',
+
+    helpH    : 'आपका सवाल यहाँ नहीं मिला?',
+    helpP    : 'टीम आपको कॉल करके पूरा समझा देगी।',
+    helpCta  : 'मुझे कॉल करके समझाएं',
+    offerCta : 'पेआउट का तरीका चुनें',
+    foot     : 'यहाँ लिखी हर बात ऐप में दिए गए ऑफ़र पेज से ही ली गई है।',
+    offerCtaNoId : 'व्योम ऐप में जाकर चुनें',
+    helpCtaNoId  : 'ऐप में ‘मुझे कॉल करके समझाएं’ चुनें',
+    reviewBar: 'रिव्यू मोड',
+    reviewLive: 'जवाब तैयार',
+    reviewPend: 'जवाब बाकी'
+  },
+  en: {
+    docTitle : 'Questions about the ₹750 structure',
+    appTitle : 'Questions & Answers',
+    toggle   : 'हिंदी',
+    h1       : 'The ₹750 structure — your questions',
+    lede     : 'The questions other CSPs ask most, answered here.',
+
+    recapH   : 'The structure at a glance',
+    r1t      : '₹750 at the start, in one go',
+    r1s      : 'On every new connection, on day 0 itself.',
+    r2t      : '3-month ISP recharge + proof',
+    r2s      : 'Once, at the start. Service for the first 3 months is your responsibility.',
+    r3t      : '₹300 per renewal from month 4',
+    r3s      : 'Whenever a 1-month renewal ticket is generated.',
+
+    helpH    : 'Did not find your question?',
+    helpP    : 'The team will call and explain everything.',
+    helpCta  : 'Call me and explain',
+    offerCta : 'Choose your payout structure',
+    foot     : 'Everything here is taken from the offer page inside the app.',
+    offerCtaNoId : 'Open the Wiom app to choose',
+    helpCtaNoId  : 'Choose ‘Call me and explain’ in the app',
+    reviewBar: 'Review mode',
+    reviewLive: 'answered',
+    reviewPend: 'awaiting a ruling'
+  }
+};
+
+/* ══════════════════════════════════════════════════════════════════════
+   CONTENT MODEL
+
+   Every question carries:
+     id      stable anchor — the page can be deep-linked as #q-<id>
+     q       the question line, hi/en
+     said    optional: what the CSP actually says on the call, quoted back
+     a       the answer, as an array of blocks (string | {type:'mini'} | {type:'note'})
+     status  'live'    → shown to CSPs
+             'pending' → HIDDEN from CSPs, visible only in ?review=1
+     ask     for pending: the exact ruling needed before it can ship
+     src     which offer facts the answer rests on (F1..F13, see the brief)
+
+   Nothing here asserts anything the opt-in page does not already say.
+   Where the answer needs a number, a date, a channel or a policy we do
+   not have, the block is 'pending' rather than guessed.
+   ══════════════════════════════════════════════════════════════════════ */
+
+var IC = {
+  money  : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 5h10M7 9h10M9 5c3 0 4.5 1.4 4.5 3.4S12 12 9 12h-.5l6 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  palm   : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 12v3a5 5 0 0 0 5 5h4.2a4 4 0 0 0 3.1-1.5L20 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 12V5.5a1.5 1.5 0 0 1 3 0V11m0-1V4.5a1.5 1.5 0 0 1 3 0V11m0-1.5V6a1.5 1.5 0 0 1 3 0v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  steps  : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 6.5l1.6 1.6L8.5 5M4 12.5l1.6 1.6L8.5 11M4 18.5l1.6 1.6L8.5 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 7h8M12 13h8M12 19h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  router : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="13" width="18" height="7" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7 16.5h.01M11 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 10V7M16 10V4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  fork   : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 21v-6M12 15L6.5 9.5M12 15l5.5-5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 10V6.5h3.5M20 10V6.5h-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  clip   : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="5" y="4" width="14" height="17" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M9 4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V6H9V4.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12h6M9 16h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  phone  : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="6" y="2.5" width="12" height="19" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 5.5v3M10 6.8a2 2 0 0 1 4 0v2.7h-4V6.8z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.8 18.5h2.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+};
+
+var FAQ = {
+
+categories: [
+
+/* ══════ 1. THE SUM HE ALREADY DID IN HIS HEAD ══════════════════════ */
+{
+  id:'paisa', icon:IC.money,
+  title:{hi:'₹750 और ₹900 का हिसाब', en:'The ₹750 and ₹900 sum'},
+  sub  :{hi:'कितना बनेगा, कब बनेगा', en:'How much, and when'},
+  questions:[
+
+  { id:'why-750-not-900', status:'live', src:['F1','F2','F7'],
+    q:{hi:'₹900 मिल रहे हैं, तो ₹750 क्यों लें?', en:'I get ₹900 — why take ₹750?'},
+    said:{hi:'₹300 का तीन महीने का ₹900 बनता है ना — तो ₹750 क्यों लेंगे?',
+          en:'₹300 three times makes ₹900 — so why would I take ₹750?'},
+    a:[
+      {hi:'₹300 तीन बार वाला हिसाब तभी पूरा बनता है जब ग्राहक तीनों महीने चले।',
+       en:'The ₹300-three-times total only completes if the customer runs all three months.'},
+      {hi:'₹750 हर हाल में उतना ही रहता है — ग्राहक 1 दिन चले, 1 महीना चले या पूरे 3 महीने। और यह शुरू में ही, एक साथ हाथ में आ जाता है।',
+       en:'₹750 stays the same in every case — customer stays 1 day, 1 month, or the full 3 months. And it reaches you at the start, in one go.'},
+      {type:'mini', rows:[
+        {label:{hi:'ग्राहक 1 दिन चला',      en:'Customer stayed 1 day'},      value:{hi:'₹750', en:'₹750'}, pink:true},
+        {label:{hi:'ग्राहक 1 महीना चला',    en:'Customer stayed 1 month'},    value:{hi:'₹750', en:'₹750'}, pink:true},
+        {label:{hi:'ग्राहक पूरे 3 महीने चला',en:'Customer stayed all 3 months'},value:{hi:'₹750', en:'₹750'}, pink:true}
+      ]}
+    ]},
+
+  { id:'lost-150-if-customer-stays', status:'live', src:['F1','F7'],
+    q:{hi:'ग्राहक पूरे 3 महीने चला तो ₹150 कम?', en:'If the customer lasts 3 months, ₹150 less?'},
+    said:{hi:'कस्टमर पूरे तीन महीने चल गया तो मेरा ₹150 का नुकसान हो गया ना',
+          en:'If the customer runs all three months, I have lost ₹150, no?'},
+    a:[
+      {hi:'हाँ — उस हाल में भी ₹750 ही रहता है, न कम न ज़्यादा।',
+       en:'Yes — in that case too it stays ₹750, no less and no more.'},
+      {hi:'बदले में यह पैसा शुरू में ही मिल जाता है, ग्राहक के चलने का इंतज़ार किए बिना।',
+       en:'In return, the money reaches you at the start, without waiting to see how long the customer stays.'}
+    ]},
+
+  { id:'when-does-750-arrive', status:'live', src:['F1','F2','F4'],
+    q:{hi:'₹750 शुरू में मिलेगा या 3 महीने बाद?', en:'Is ₹750 paid at the start or after 3 months?'},
+    a:[
+      {hi:'शुरू में ही — 3 महीने बाद नहीं। 3 महीने का ISP रिचार्ज करके प्रूफ़ ऐप पर अपलोड करना है, उसके बाद ₹750 मिलता है।',
+       en:'At the start — not after 3 months. Do the 3-month ISP recharge, upload the proof in the app, and then ₹750 is paid.'},
+      {hi:'पूरा एक साथ, महीने-महीने टुकड़ों में नहीं।',
+       en:'The full amount in one go, not split month by month.'}
+    ]},
+
+  { id:'nothing-in-months-1-to-3', status:'live', src:['F2','F5'],
+    q:{hi:'महीना 1, 2, 3 में कुछ नहीं मिलेगा?', en:'Nothing at all in months 1, 2 and 3?'},
+    said:{hi:'मतलब तीन महीने तक बीच में एक रुपया भी नहीं आएगा?',
+          en:'So not a single rupee comes in through those three months?'},
+    a:[
+      {hi:'उन तीन महीनों में अलग से कोई पेआउट नहीं आता, क्योंकि तीनों महीने का पैसा शुरू में ही मिल चुका होता है।',
+       en:'No separate payout comes in those three months, because the money for all three months has already been paid at the start.'},
+      {hi:'इन 3 महीनों में ग्राहक को अच्छी सर्विस देते रहें ताकि आप बोनस के योग्य बने रहें।',
+       en:'Keep giving good service to the customer during these 3 months so you remain eligible for the bonus.'}
+    ]},
+
+  { id:'earning-after-3-months', status:'live', src:['F6'],
+    q:{hi:'3 महीने के बाद कितना — ₹300 या ₹250?', en:'After 3 months — ₹300 or ₹250?'},
+    said:{hi:'सुना है रिन्यूअल का ₹300 से घटाकर ₹250 कर दिया है',
+          en:'I heard the renewal payout has been cut from ₹300 to ₹250'},
+    a:[
+      {hi:'₹300 ही है, ₹250 नहीं।', en:'It is ₹300, not ₹250.'},
+      {hi:'महीना 4 से आगे जब भी 1 महीने का रिन्यूअल टिकट बनेगा, उस पर ₹300 मिलेगा।',
+       en:'From month 4 onwards, whenever a 1-month renewal ticket is generated, you get ₹300 on it.'}
+    ]},
+
+  { id:'month4-every-time', status:'live', src:['F6'],
+    q:{hi:'महीना 4 वाला ₹300 हर बार मिलेगा?', en:'Is the month-4 ₹300 paid every time?'},
+    a:[
+      {hi:'हर बार — एक बार का नहीं। जब भी 1 महीने का रिन्यूअल टिकट बनेगा, हर टिकट पर ₹300 मिलता रहेगा।',
+       en:'Every time — not once. Whenever a 1-month renewal ticket is generated, ₹300 comes on each such ticket.'}
+    ]},
+
+  { id:'my-customers-stay', status:'live', src:['F7','F9'],
+    q:{hi:'मेरे ग्राहक टिकते हैं — मैं रिस्क लूँ तो?', en:'My customers stay — can I just carry the risk?'},
+    said:{hi:'मैं पूरा ₹300 लेने के लिए रिस्क ले लेता हूँ, क्या दिक्कत है? मेरे कस्टमर तो चलते हैं',
+          en:'I will carry the risk to get the full ₹300 — what is the problem? My customers do stay'},
+    a:[
+      {hi:'कोई दिक्कत नहीं। नया तरीका उस हाल के लिए बना है जब ग्राहक बीच में बंद कर दे — तब भी ₹750 वही रहता है।',
+       en:'No problem at all. The new structure is built for the case where a customer stops midway — even then ₹750 stays the same.'},
+      {hi:'आपके इलाक़े में ग्राहक कितना चलते हैं, यह आपसे बेहतर कोई नहीं जानता।',
+       en:'How long customers stay in your area is something nobody knows better than you.'}
+    ]},
+
+  { id:'attrition-data', status:'pending', src:[],
+    q:{hi:'ज़्यादातर ग्राहक पूरे 3 महीने चलते हैं क्या?', en:'Do most customers actually last 3 months?'},
+    said:{hi:'आपके पास आँकड़ा है क्या कि कितने कस्टमर पूरे तीन महीने चलते हैं?',
+          en:'Do you have the number — how many customers actually run all three months?'},
+    ask:'What share of new connections complete all 3 monthly recharges (last 6-12 months)? This one number is the whole ₹750-vs-₹900 argument — without it the comparison stays a matter of opinion. Also confirm the OLD structure in one line (₹300 per monthly renewal ticket, paid only when the customer actually renews?) — every answer in this category rests on that being true.'},
+
+  { id:'month4-no-renewal', status:'pending', src:[],
+    q:{hi:'चौथे महीने ग्राहक ने रिन्यू नहीं कराया तो?', en:'What if the customer does not renew in month 4?'},
+    ask:'From month 4, if no 1-month renewal ticket is ever generated — does the CSP get nothing, owe anything, or lose the connection?'}
+  ]
+},
+
+/* ══════ 2. HIS OWN MARGIN — the second sum he does ═════════════════ */
+{
+  id:'kharcha', icon:IC.palm,
+  title:{hi:'मेरा खर्च, मेरी बचत', en:'My cost, my margin'},
+  sub  :{hi:'ISP का रेट और हाथ में क्या बचा', en:'The ISP rate and what is left'},
+  questions:[
+
+  { id:'isp-550-leaves-200', status:'live', src:['F1','F2','F3','F5'],
+    q:{hi:'ISP का रिचार्ज महँगा है — मेरा फ़ायदा क्या?', en:'My ISP recharge is costly — what is in it for me?'},
+    said:{hi:'3 महीने का ISP रिचार्ज ही ₹550 का पड़ता है, और 3 महीने सर्विस भी मेरी — इसमें मेरा क्या फ़ायदा?',
+          en:'The 3-month ISP recharge alone costs me ₹550, and service for 3 months is mine too — where is my gain?'},
+    a:[
+      {hi:'₹750 पहले 3 महीने का पूरा पेआउट आपको शुरू में ही मिल जाता है, अब अगर कस्टमर बीच में छोड़ के चला जाता है तो उसका नुकशान आपको नहीं होता बल्कि व्योम उठाता है।',
+       en:'₹750 is the full payout for the first 3 months and you get it upfront. If the customer leaves in between, the loss is not yours — Wiom bears it.'},
+      {hi:'और 4 महीने से आगे उसी ग्राहक के हर रिन्यूअल टिकट पर आपको ₹300 मिलता है।',
+       en:'And from month 4 onwards, you get ₹300 on every renewal ticket for that same customer.'}
+    ]},
+
+  { id:'750-on-every-connection', status:'live', src:['F1','F3'],
+    q:{hi:'₹750 हर कनेक्शन पर या एक ही बार?', en:'Is ₹750 per connection or just once?'},
+    said:{hi:'ये ₹750 एक बार का है या जितने कनेक्शन लगाऊँ सब पे मिलेगा?',
+          en:'Is this ₹750 one-time, or on every connection I install?'},
+    a:[
+      {hi:'हर नए कनेक्शन पर अलग ₹750 — एक बार का नहीं।',
+       en:'A separate ₹750 on every new connection — not a one-time amount.'},
+      {hi:'हर कनेक्शन पर 3 महीने का ISP रिचार्ज और पहले 3 महीने की सर्विस भी आपकी ही रहेगी।',
+       en:'On each connection, the 3-month ISP recharge and the first 3 months of service also stay yours.'}
+    ]},
+
+  { id:'no-installs-what-do-i-get', status:'live', src:['F1','F4','F10'],
+    q:{hi:'इंस्टॉलेशन ही नहीं होता, तो प्लान से क्या?', en:'I get no installations — what use is the plan?'},
+    said:{hi:'मेरे यहाँ लीड ही नहीं आती, इंस्टॉलेशन ही नहीं होता — फिर ये प्लान लेकर मैं क्या करूँगा?',
+          en:'No leads come to me, no installations happen — so what would I do with this plan?'},
+    a:[
+      {hi:'यह तरीका सिर्फ़ नए कनेक्शन पर चलता है। नया कनेक्शन नहीं लगा तो न कोई रिचार्ज करना है, न कोई पेआउट बनता है।',
+       en:'This structure only runs on new connections. If no new connection is installed, there is no recharge to do and no payout either.'},
+      {hi:'पहले से लगे कनेक्शन पुराने तरीके पर ही चलते रहेंगे।',
+       en:'Connections already installed continue on the old structure.'}
+    ]},
+
+  { id:'bonus-how-it-works', status:'live', src:[],
+    q:{hi:'इस प्लान में बोनस कैसे काम करता है?', en:'How does the bonus work in this plan?'},
+    said:{hi:'बोनस कैसे मिलता है? कब मिलता है?',
+          en:'How do I get the bonus? When does it come?'},
+    a:[
+      {hi:'आपको कस्टमर को अच्छी सर्विस देनी है, ताकि वह हमारे साथ जुड़ा रहे।',
+       en:'You need to give good service to the customer so they stay connected with us.'},
+      {hi:'कस्टमर 1, 2 या 3 महीने तक हमारे साथ जुड़ा रहता है, तो आप उस महीने के बोनस के लिए योग्य होंगे।',
+       en:'If the customer stays with us for 1, 2 or 3 months, you will be eligible for that month\u2019s bonus.'},
+      {hi:'अगर कस्टमर बीच में ही सर्विस छोड़ देता है, तो उस कस्टमर के लिए उस महीने का बोनस नहीं मिलेगा।',
+       en:'If the customer leaves the service in between, you will not get the bonus for that customer for that month.'},
+      {hi:'कस्टमर जितने समय तक हमारे साथ जुड़ा रहेगा, आप उतने समय के बोनस के लिए योग्य रहेंगे।',
+       en:'The longer the customer stays with us, the longer you remain eligible for the bonus.'},
+      {type:'note', hi:'अच्छी सर्विस दें, कस्टमर को जोड़े रखें और हर महीने बोनस पाएं।',
+       en:'Give good service, keep the customer connected, and earn the bonus every month.'}
+    ]},
+
+  { id:'does-750-vary-by-area-or-isp', status:'pending', src:[],
+    q:{hi:'₹750 इलाक़े या ISP के रेट से बदलता है?', en:'Does ₹750 change by area or ISP rate?'},
+    ask:'Is ₹750 a single national number, or does it vary by area, ISP rate, or CSP tier? The offer page says "₹750 on every new connection" but never says it is uniform across areas — we should not claim uniformity without your confirmation.'},
+
+  { id:'relief-for-costly-isp', status:'pending', src:[],
+    q:{hi:'ISP महँगा है तो कुछ अलग मिलेगा क्या?', en:'Is there anything extra where the ISP is costly?'},
+    ask:'For the 9 CSPs whose 3-month ISP recharge runs ₹500+: is there any relief, slab, or top-up — or is the honest answer "no, ₹750 is the same for everyone"? Either answer is printable; silence is not.'},
+
+  { id:'isp-no-3-month-plan', status:'pending', src:[],
+    q:{hi:'मेरे ISP में 3 महीने का प्लान ही नहीं है, तब?', en:'My ISP has no 3-month plan — then what?'},
+    said:{hi:'वो फ़ोर मंथ के प्लान हैं — अगर फ़ोर मंथ स्कीम होते तो हम वो कर देते',
+          en:'They only have four-month plans — if there were a four-month scheme we would have done it'},
+    ask:'When the local ISP sells only 4-month (or 6-month) plans and no 3-month plan: does a longer recharge qualify, does the CSP still get ₹750, and what does he upload as proof?'}
+  ]
+},
+
+/* ══════ 3. THE SEQUENCE OF ACTIONS — the 49-CSP bucket ════════════ */
+{
+  id:'karna-kya-hai', icon:IC.steps,
+  title:{hi:'मुझे करना क्या है', en:'What I have to do'},
+  sub  :{hi:'रिचार्ज, प्रूफ़ और आगे का काम', en:'Recharge, proof, and what follows'},
+  questions:[
+
+  { id:'who-does-isp-recharge', status:'live', src:['F3','F4'],
+    q:{hi:'3 महीने का ISP रिचार्ज कौन करेगा?', en:'Who does the 3-month ISP recharge?'},
+    said:{hi:'पैसा तो पहले मेरी जेब से ही लगेगा ना? रिचार्ज मैं करूँ, फिर ₹750 आएगा?',
+          en:'The money goes out of my pocket first, no? I recharge, and then ₹750 comes?'},
+    a:[
+      {hi:'हाँ, रिचार्ज आप करते हैं — नए कनेक्शन के साथ, शुरू में एक बार, 3 महीने का।',
+       en:'Yes, you do the recharge — once at the start, along with the new connection, for 3 months.'},
+      {hi:'फिर प्रूफ़ ऐप पर अपलोड करना है, उसके बाद ₹750 एक साथ मिलता है।',
+       en:'Then upload the proof in the app, and after that ₹750 comes in one go.'}
+    ]},
+
+  { id:'months-1-3-what-to-do', status:'live', src:['F3','F5'],
+    q:{hi:'महीना 1, 2, 3 में मुझे क्या करना है?', en:'What do I do in months 1, 2 and 3?'},
+    a:[
+      {hi:'इन 3 महीनों में कोई रिचार्ज नहीं करना — रिचार्ज और पेआउट दोनों शुरू में ही हो चुके होते हैं।',
+       en:'No recharge in these 3 months — both the recharge and the payout have already happened at the start.'},
+      {hi:'इन महीनों में ग्राहक की सर्विस आपकी ज़िम्मेदारी है।',
+       en:'Through these months the customer’s service is your responsibility.'}
+    ]},
+
+  { id:'proof-every-month', status:'live', src:['F3','F4','F5'],
+    q:{hi:'क्या हर महीने प्रूफ़ डालना पड़ेगा?', en:'Do I upload proof every month?'},
+    said:{hi:'हर महीने फ़ोटो खींचकर डालनी पड़ेगी क्या? इतना झंझट नहीं होगा मुझसे',
+          en:'Do I have to click and upload a photo every month? I cannot manage that much bother'},
+    a:[
+      {hi:'रिचार्ज शुरू में एक ही बार होता है, इसलिए उसका प्रूफ़ भी एक ही बार डालना होता है।',
+       en:'The recharge is done once at the start, so its proof is also uploaded just once.'},
+      {hi:'महीना 1 से 3 तक कुछ अपलोड नहीं करना होता।',
+       en:'Nothing to upload from month 1 through 3.'}
+    ]},
+
+  { id:'month-4-what-to-do', status:'live', src:['F3','F6'],
+    q:{hi:'महीना 4 से ₹300 के लिए क्या करना है?', en:'From month 4, what do I do for the ₹300?'},
+    a:[
+      {hi:'महीना 4 से जब भी उस ग्राहक का 1 महीने का रिन्यूअल टिकट बनेगा, उसी पर ₹300 मिलेगा।',
+       en:'From month 4, whenever a 1-month renewal ticket is generated for that customer, ₹300 comes on it.'}
+    ]},
+
+  { id:'customer-3-months-or-1-month', status:'pending', src:[],
+    q:{hi:'ग्राहक से 3 महीने का लेना है या 1 महीने का?', en:'Do I collect 3 months from the customer or 1?'},
+    said:{hi:'कस्टमर से क्या लेना है — 3 महीने का या एक ही महीने का?',
+          en:'What do I take from the customer — three months or just one?'},
+    ask:'At day 0, does the CSP collect 3 months of money from the customer upfront, or does the customer keep paying month by month while the CSP fronts the 3-month ISP recharge? This is the single largest hole on the page — bucket 6 (12 CSPs) and bucket 9 (9 CSPs) both stall here.'},
+
+  { id:'customer-wont-pay-3-months', status:'pending', src:[],
+    q:{hi:'ग्राहक 3 महीने का पैसा एक साथ नहीं देगा, तब?', en:'The customer will not pay 3 months upfront — then what?'},
+    ask:'If the customer will only pay month by month, does the CSP still do the full 3-month ISP recharge from his own pocket and still get the ₹750 — yes or no, in one line?'},
+
+  { id:'what-proof-where-upload', status:'pending', src:[],
+    q:{hi:'प्रूफ़ में क्या डालना है और कहाँ से?', en:'What counts as proof, and where do I upload it?'},
+    ask:'What exactly counts as valid recharge proof (receipt photo, screenshot, transaction ID), and at which screen in the CSP app does the upload happen? Bucket 15 CSPs say they would forfeit ₹750 rather than deal with the photo — a one-line "एक बार, एक फ़ोटो" shrinks the task.'},
+
+  { id:'proof-rejected', status:'pending', src:[],
+    q:{hi:'प्रूफ़ रिजेक्ट हो गया या डालना भूल गया तो?', en:'What if the proof is rejected, or I forget to upload it?'},
+    ask:'If the proof is unclear, rejected, or uploaded some days after the recharge — can the CSP re-upload, is there a time limit, and who tells him it was rejected?'},
+
+  { id:'when-750-credited', status:'pending', src:[],
+    q:{hi:'प्रूफ़ डालने के कितने दिन बाद पैसा आएगा?', en:'How many days after upload does the money arrive?'},
+    said:{hi:'प्रूफ़ तो डाल दिया, अब पैसा कितने दिन में आएगा? पैसा फँसा तो नहीं रहेगा?',
+          en:'I uploaded the proof — now in how many days does the money come? It will not stay stuck?'},
+    ask:'From proof upload, what is the committed time for ₹750 to reach the CSP (same day / X days), and where in the app does he see it landed? The offer page says the money is paid at the start but never names a TAT — so we currently cannot answer the most-asked follow-up.'},
+
+  { id:'already-recharged-1-month', status:'pending', src:[],
+    q:{hi:'1 महीने का रिचार्ज कर चुका हूँ, अब क्या?', en:'I already did a 1-month recharge — now what?'},
+    ask:'A CSP who has already done a 1-month recharge on a fresh connection — can he top up to 3 months and still qualify, or has that connection missed the structure?'},
+
+  { id:'month4-who-recharges', status:'pending', src:[],
+    q:{hi:'महीना 4 से रिचार्ज कौन करेगा — मैं या ग्राहक?', en:'From month 4, who recharges — me or the customer?'},
+    ask:'From month 4, who does the monthly recharge, and what causes the 1-month renewal ticket to be generated — the customer paying, the CSP recharging, or the system? Does the CSP upload anything again?'},
+
+  { id:'what-to-tell-customer', status:'pending', src:[],
+    q:{hi:'ग्राहक को क्या बताऊँ — उसका कुछ बदलेगा?', en:'What do I tell the customer — does anything change for him?'},
+    ask:'Does anything change for the CUSTOMER under this structure — his plan, price, tenure or payment cycle — and what is the one sentence a CSP should say to him? Every question on this page is CSP-to-Wiom; nothing yet is CSP-to-customer, and the CSP is the one standing in front of him.'}
+  ]
+},
+
+/* ══════ 4. THE CHURN SCENARIO — one event, six consequences ═══════ */
+{
+  id:'grahak-chhode', icon:IC.router,
+  title:{hi:'ग्राहक बीच में छोड़ दे तो', en:'If the customer leaves'},
+  sub  :{hi:'पैसा, रिचार्ज और मेरी ज़िम्मेदारी', en:'The money, the recharge, my duty'},
+  questions:[
+
+  { id:'clawback-750-early-exit', status:'live', src:['F7','F9'],
+    q:{hi:'ग्राहक जल्दी बंद करे — ₹750 वापस लेंगे?', en:'Customer stops early — is the ₹750 taken back?'},
+    said:{hi:'कस्टमर हफ़्ते भर में छोड़ के चला गया तो ₹750 वापस काट लोगे क्या?',
+          en:'If the customer pulls out within a week, will you deduct the ₹750 back?'},
+    a:[
+      {hi:'नहीं। 3 महीने का ISP रिचार्ज शुरू में, नए कनेक्शन के साथ, एक ही बार करना होता है।',
+       en:'No. The 3-month ISP recharge is done once, at the start, along with the new connection.'},
+      {hi:'ग्राहक जल्दी बंद कर दे तब भी आपके कोई पैसे वापस नहीं लिया जाएगा।',
+       en:'Even if the customer stops early, none of your money is taken back.'}
+    ]},
+
+  { id:'recharge-again-if-customer-leaves', status:'live', src:['F3','F4','F8'],
+    q:{hi:'ग्राहक चला गया — दोबारा रिचार्ज करना पड़ेगा?', en:'Customer left — do I recharge again?'},
+    a:[
+      {hi:'नहीं। 3 महीने का ISP रिचार्ज शुरू में, नए कनेक्शन के साथ, एक ही बार करना है।',
+       en:'No. The 3-month ISP recharge is done once, at the start, along with the new connection.'},
+      {hi:'ग्राहक जल्दी बंद कर दे तब भी दूसरा रिचार्ज नहीं है।',
+       en:'Even if the customer stops early, there is no second recharge.'}
+    ]},
+
+  { id:'customer-left-recharge-sunk', status:'live', src:['F7','F8'],
+    q:{hi:'ग्राहक जल्दी छोड़ दे तो रिचार्ज का पैसा?', en:'If he leaves early, what about my recharge money?'},
+    said:{hi:'ग्राहक 15 दिन में छोड़ गया तो मेरा 3 महीने का रिचार्ज तो डूब गया — उसका कुछ मिलेगा?',
+          en:'If the customer left in 15 days my 3-month recharge is sunk — do I get anything for that?'},
+    a:[
+      {hi:'ग्राहक जल्दी छोड़ दे तब भी आपके कोई पैसे वापस नहीं करना होता है — आपका ₹750 आपके पास रहता है।',
+       en:'Even if the customer leaves early, you do not have to return any money — your ₹750 stays with you.'}
+    ]},
+
+  { id:'customer-stops-early-my-work', status:'live', src:['F8','F9'],
+    q:{hi:'ग्राहक बीच में बंद कर दे तो क्या करना है?', en:'If the customer stops midway, what do I have to do?'},
+    a:[
+      {hi:'ज़िम्मेदारी वही रहती है जो शुरू में तय हुई — 3 महीने का रिचार्ज, जो हो चुका, और सर्विस।',
+       en:'The responsibility stays what was set at the start — the 3-month recharge, already done, and the service.'},
+      {hi:'अलग से कोई नया काम नहीं आता।',
+       en:'No new task comes up separately.'}
+    ]},
+
+  { id:'who-tells-me-customer-left', status:'live', src:['F9'],
+    q:{hi:'ग्राहक ने बंद किया, मुझे पता कैसे चलेगा?', en:'If the customer stops, how will I know?'},
+    a:[
+      {hi:'आपको व्योम सही वक़्त पर बता देगा। आप टेंशन फ्री होकर प्लान चुनें।',
+       en:'Wiom will inform you at the right time. Choose the plan without worry.'}
+    ]},
+
+  { id:'router-not-returned-1800', status:'pending', src:[],
+    q:{hi:'ग्राहक चला गया, राउटर वापस न मिले तो?', en:'Customer left and the router is not returned — then?'},
+    said:{hi:'राउटर वापस नहीं मिला तो ₹1,800 मेरे सिर पड़ेगा — इसका क्या?',
+          en:'If the router does not come back, ₹1,800 lands on me — what about that?'},
+    ask:'Under the ₹750 structure, does the router-recovery liability (the ₹1,800) change at all, and where does the CSP deposit a recovered router? 7 CSPs are blocked purely on this, and it sits right next to "₹750 is never taken back" — if we cannot answer it, that reassurance is undercut.'},
+
+  { id:'service-duty-after-customer-gone', status:'pending', src:[],
+    q:{hi:'ग्राहक ही नहीं रहा — फिर भी 3 महीने सर्विस?', en:'The customer is gone — is service still owed for 3 months?'},
+    ask:'The offer page says the 3-month service responsibility "stays the same" in all three churn cases. Literally read, a CSP owes service to a customer who has left. What does the duty actually mean once the customer is gone — nothing, or something?'},
+
+  { id:'replacement-customer-same-recharge', status:'pending', src:[],
+    q:{hi:'बचे हुए रिचार्ज पर दूसरा ग्राहक लगा दूँ तो?', en:'Can I put another customer on the remaining recharge?'},
+    ask:'If the customer leaves in month 1, can the CSP move a new customer onto the remaining ISP recharge — and if he does, does that count as a new connection with a fresh ₹750, or not?'},
+
+  { id:'churn-hurts-rating-leads-audit', status:'pending', src:[],
+    q:{hi:'ग्राहक जल्दी छोड़े तो रेटिंग या लीड पर असर?', en:'Does early churn hurt my rating or lead flow?'},
+    ask:'Does a customer churning in the first 3 months count against the CSP anywhere else — rating, lead allocation, audit outcome, or future eligibility?'}
+  ]
+},
+
+/* ══════ 5. THE COMMITMENT — what saying yes actually binds ════════ */
+{
+  id:'haan-se-pehle', icon:IC.fork,
+  title:{hi:'हाँ कहने से पहले', en:'Before you say yes'},
+  sub  :{hi:'किन कनेक्शनों पर लगेगा, और वापसी', en:'Which connections, and the way back'},
+  questions:[
+
+  { id:'every-new-connection-after-yes', status:'live', src:['F1','F3','F10'],
+    q:{hi:'क्या अब हर नए कनेक्शन पर यही चलेगा?', en:'Will this apply to every new connection now?'},
+    said:{hi:'आगे जितनी भी बुकिंग आएगी सब पे मुझे थ्री मंथ्स का करना पड़ेगा',
+          en:'On every booking that comes from now on I will have to do the three-month one'},
+    a:[
+      {hi:'हाँ। जिस दिन आप नया तरीका चुनते हैं, उसके बाद लगने वाले हर नए कनेक्शन पर यही चलेगा।',
+       en:'Yes. From the day you choose the new structure, it runs on every new connection installed after that.'},
+      {hi:'हर एक पर शुरू में 3 महीने का ISP रिचार्ज, और पहले 3 महीने का पूरा पेआउट एक साथ।',
+       en:'On each one: the 3-month ISP recharge at the start, and the complete payout for the first 3 months in one go.'}
+    ]},
+
+  { id:'old-connections-unchanged', status:'live', src:['F10'],
+    q:{hi:'मेरे पुराने कनेक्शनों का क्या होगा?', en:'What happens to my existing connections?'},
+    said:{hi:'मेरे जो कस्टमर अभी चल रहे हैं, उनका महीने वाला पेमेंट बंद हो जाएगा क्या?',
+          en:'My customers running right now — will their monthly payment stop?'},
+    a:[
+      {hi:'नहीं, उन पर कोई असर नहीं होगा। पहले से लगे कनेक्शन पुराने तरीके पर ही चलते रहेंगे।',
+       en:'No, there is no effect on them. Connections already installed continue on the old structure.'},
+      {hi:'नया तरीका सिर्फ़ चुनने की तारीख़ के बाद लगने वाले कनेक्शनों पर लगेगा।',
+       en:'The new structure applies only to connections installed after the date you choose it.'}
+    ]},
+
+  { id:'old-lead-installed-later', status:'live', src:['F10'],
+    q:{hi:'पुरानी लीड बाद में लगी तो कौन सा तरीका?', en:'An old lead installed later — which structure?'},
+    a:[
+      {hi:'गिनती इंस्टॉलेशन की तारीख़ से होती है। लीड चाहे पहले की हो, कनेक्शन चुनने की तारीख़ के बाद लगा तो नया तरीका लगेगा।',
+       en:'It goes by the installation date. Even if the lead is old, if the connection is installed after the date you opt in, the new structure applies.'}
+    ]},
+
+  { id:'anything-hidden', status:'live', src:['F3'],
+    q:{hi:'इसमें कुछ छिपा हुआ तो नहीं है?', en:'Is there something hidden in this?'},
+    said:{hi:'इसमें छिपा क्या है?', en:'What is hidden in this?'},
+    a:[
+      {hi:'शुरू में 3 महीने का ISP रिचार्ज करना है और उसका प्रूफ़ देना है। इसके अलावा और कुछ भी इस प्लान में छिपा नहीं है।',
+       en:'You have to do a 3-month ISP recharge at the start and submit proof. Other than that, nothing is hidden in this plan.'}
+    ]},
+
+  { id:'no-decline-button', status:'live', src:['F10','F11'],
+    q:{hi:'मना करने का बटन नहीं दिख रहा, क्या करूँ?', en:'There is no \u2018no\u2019 button \u2014 what do I do?'},
+    said:{hi:'मुझे लेना नहीं था, पर ऐप में तो सिर्फ़ I Agree ही था — मना करने का बटन ही नहीं मिला',
+          en:'I did not want to take it, but the app only had I Agree — there was no button to decline'},
+    a:[
+      {hi:'अभी हाँ नहीं कहनी है तो \u2018मुझे कॉल करके समझायें\u2019 बटन चुन लें — टीम 24 घंटे के अंदर कॉल करेगी।',
+       en:'If you do not want to say yes right now, choose the \u2018Call me and explain\u2019 button — the team calls within 24 hours.'},
+      {hi:'जब तक आप नया तरीका नहीं चुनते, आपके कनेक्शनों पर अभी वाला तरीका ही चलता रहेगा।',
+       en:'Until you choose the new structure, your connections stay on the structure you are on today.'},
+      {type:'cta', hi:'मुझे कॉल करके समझायें', en:'Call me and explain'}
+    ]},
+
+  { id:'who-do-i-talk-to', status:'live', src:['F11'],
+    q:{hi:'फ़ोन पर समझना है — किससे बात करूँ?', en:'I want it explained on a call — whom do I talk to?'},
+    a:[
+      {hi:'टीम 24 घंटे के अंदर कॉल करके पूरा समझा देगी।',
+       en:'The team calls within 24 hours and explains it fully.'},
+      {type:'cta', hi:'मुझे कॉल करके समझायें', en:'Call me and explain'}
+    ]},
+
+  { id:'can-i-go-back', status:'pending', src:[],
+    q:{hi:'बाद में वापस पुराने तरीके पर आ सकते हैं?', en:'Can I go back to the old structure later?'},
+    said:{hi:'एक बार हाँ कर दी तो हमेशा के लिए फँस गए? बिना समझे हाँ दब गई तो?',
+          en:'Once I say yes, am I stuck forever? And if the yes got pressed without my understanding it?'},
+    ask:'Is opting in reversible — can a CSP return to the old structure, through what route (app / call / team), and from when does the switch take effect? 10 CSPs declined on lock-in alone, and 6 more pressed I Agree with no decline button on screen. Both need this same one-line ruling.'},
+
+  { id:'already-declined-can-i-say-yes', status:'pending', src:[],
+    q:{hi:'मैंने पहले मना कर दिया था — अब हाँ कर सकता हूँ?', en:'I declined earlier — can I say yes now?'},
+    ask:'A CSP who already declined (or said no on the call) — can he still opt in, through which route, and does the structure then apply from that later date? This page’s main reader is exactly this person: 100 declined, and 32 said yes once it was explained. Right now nothing on the page speaks to him.'},
+
+  { id:'said-yes-on-call-recorded', status:'pending', src:[],
+    q:{hi:'कॉल पर हाँ बोल दी थी — दर्ज हुई कि नहीं?', en:'I said yes on the call — was it recorded?'},
+    ask:'When a CSP agrees on a call, is the opt-in recorded then and there, or must he still confirm in the app — and where does he later see which structure he is on? 46 CSPs agreed verbally and their app may still show the old screen.'},
+
+  { id:'safe-to-keep-current', status:'pending', src:[],
+    q:{hi:'अभी वाला रखूँ तो कोई नुक़सान होगा?', en:'If I keep my current structure, do I lose anything?'},
+    ask:'Confirm in one line that a CSP who keeps the current structure loses nothing — no lead impact, no rating impact, no withdrawal of the existing payout. The offer page presents both as equal choices; we should be able to say so plainly.'},
+
+  { id:'terms-change-later', status:'pending', src:[],
+    q:{hi:'हाँ कहने के बाद शर्तें बदल जाएँगी क्या?', en:'Will the terms change after I say yes?'},
+    ask:'Once a CSP opts in, can the ₹750 or the month-4 ₹300 be revised later, and would he be told in advance? 7 CSPs asked "इसमें हिडन क्या चीज है?" while accepting — this is the answer that settles it.'}
+  ]
+},
+
+/* ══════ 6. THE GATE BETWEEN 'हाँ' AND ACTIVATION (flow2 / flow3) ═══
+   Only some CSPs see an audit gate, so every line here is written
+   conditionally — "अगर आपसे ... माँगा जा रहा है". One shared link
+   means everyone can read this category. ════════════════════════════ */
+{
+  id:'audit', icon:IC.clip,
+  title:{hi:'ऑडिट और जुड़ना', en:'Audit and joining'},
+  sub  :{hi:'फ़ॉर्म, ऑडिट और किसे मिल रहा है', en:'The form, the audit, and who gets it'},
+  questions:[
+
+  { id:'audit-consent-form', status:'live', src:['F12'],
+    q:{hi:'ऑडिट कंसेंट फ़ॉर्म क्यों माँगा जा रहा है?', en:'Why is an audit consent form being asked for?'},
+    a:[
+      {hi:'आपके नेट-बॉक्स ऑडिट करने के बाद आपके नेट-बॉक्स के सिक्योरिटी डिपॉज़िट को फ़ाइनलाइज़ किया जाता है।',
+       en:'After auditing your netboxes, the security deposit for your netboxes is finalised.'},
+      {hi:'एक बार आप इस पर साइन ऑफ़ करते हो, तो आपके पास नए नेट-बॉक्स ऑर्डर करने का ऑप्शन ओपन हो जाता है।',
+       en:'Once you sign off on this, the option to order new netboxes opens up for you.'},
+      {hi:'यदि आपका ऑडिट कंसेंट पेंडिंग होगा तो आप नए नेट-बॉक्स ऑर्डर नहीं कर पाएँगे और ₹750 ऑफ़र का लाभ नहीं ले पाएँगे।',
+       en:'If your audit consent is pending, you will not be able to order new netboxes and will not be able to avail the \u20b9750 offer.'}
+    ]},
+
+  { id:'audit-pending-activation', status:'live', src:['F13'],
+    q:{hi:'ऑडिट पेंडिंग है तो प्लान कब चालू होगा?', en:'My audit is pending — when does the plan start?'},
+    a:[
+      {hi:'ऑडिट कम्प्लीट करना होगा। उसके बाद ऑडिट के मुताबिक़ जितना भी आपके PSF का फ़ाइनल SD बना, उसका कंसेंट साइन होगा।',
+       en:'The audit needs to be completed. After that, consent will be signed for whatever final SD is determined for your PSF as per the audit.'},
+      {hi:'इसके बाद आप ₹750 के ऑफ़र के लिए एलिजिबल हो जाओगे।',
+       en:'After this you will become eligible for the \u20b9750 offer.'}
+    ]},
+
+  { id:'what-audit-checks', status:'pending', src:[],
+    q:{hi:'ऑडिट में क्या-क्या देखा जाएगा?', en:'What does the audit check?'},
+    ask:'What does the audit actually cover, roughly how long does it take, and what happens if it does not clear? Right now the app shows a blocking screen with no explanation attached to it.'},
+
+  { id:'who-in-family-can-choose', status:'pending', src:[],
+    q:{hi:'ऐप किसी और के नाम पर है — कौन चुनेगा?', en:'The app is in someone else’s name — who chooses?'},
+    said:{hi:'ऐप मेरे भाई के नाम पर है, वही चलाते हैं — मैं कैसे करूँ?',
+          en:'The app is in my brother’s name, he runs it — how do I do this?'},
+    ask:'Must the registered account holder opt in, or can the person actually running the app do it? 11 CSPs were reached through a brother, father or manager who could not enrol. If only the owner can, what should the person on the phone be told to do?'},
+
+  { id:'who-is-eligible', status:'pending', src:[],
+    q:{hi:'यह प्लान किन CSP को मिल रहा है?', en:'Which CSPs is this plan being offered to?'},
+    ask:'What is the eligibility rule for this offer, and is it stated anywhere a CSP can see? One CSP asked for "eligibility criteria 3/4" — we do not currently know what he was referring to.'},
+
+  { id:'last-date', status:'pending', src:[],
+    q:{hi:'क्या इसकी कोई आख़िरी तारीख़ है?', en:'Is there a last date for this?'},
+    ask:'Is there an opt-in deadline? If there is NO deadline, say so and this question ships as a calm "कोई आख़िरी तारीख़ नहीं" line. If a deadline exists, tell us the date. Note: shipping this question without an answer would manufacture exactly the urgency the copy rules forbid, so it stays hidden until you rule.'}
+  ]
+},
+
+/* ══════ 7. THE RUNNING ACCOUNT — visibility, trust, adjacent money ═
+   Every block here is unanswered today, so the whole category is
+   hidden from CSPs. It covers the LARGEST defect bucket (20 CSPs who
+   cannot see the offer) and the ~120 who spent their whole call on
+   carry fee, bonus and leads. ═══════════════════════════════════════ */
+{
+  id:'app-bharosa', icon:IC.phone,
+  title:{hi:'ऐप, बोनस और भरोसा', en:'The app, the bonus, and trust'},
+  sub  :{hi:'ऑफ़र कहाँ है, पिछला पैसा कहाँ है', en:'Where the offer is, where the old money is'},
+  questions:[
+
+  { id:'where-in-app', status:'pending', src:[],
+    q:{hi:'यह ऑफ़र ऐप में कहाँ दिखेगा?', en:'Where in the app does this offer appear?'},
+    ask:'What is the exact path a CSP taps to reach the offer (home card / bell / "सारे काम" / a link)? 20 CSPs never saw it — one was sent it twelve times and his bell still read "कोई नोटिफिकेशन नहीं है". This is the single most-needed answer on the page.'},
+
+  { id:'never-received-bell-empty', status:'pending', src:[],
+    q:{hi:'यह मेरे पास आया ही नहीं — अब क्या करूँ?', en:'It never reached me — what now?'},
+    ask:'For a CSP whose app genuinely does not show the offer: what should he do — update the app, ask the team, use a link? And is there a route that does not depend on the app at all? A third of the "undecided" CSPs cannot see the offer on their phone today.'},
+
+  { id:'how-to-say-yes-from-here', status:'pending', src:[],
+    q:{hi:'यह पन्ना किसी ने भेजा है — हाँ यहाँ से कैसे करूँ?', en:'Someone forwarded me this page — how do I say yes from here?'},
+    ask:'Should this FAQ page carry its own way to act, or only point back to the app? A reader who arrives on a forwarded WhatsApp link has no cspId, so the offer page will refuse to open for him — today that is a dead end for the manager reading on the owner’s behalf and for the 20 who cannot see it in the app.'},
+
+  { id:'will-750-actually-come', status:'pending', src:[],
+    q:{hi:'₹750 सच में आ जाएगा — भरोसा क्या है?', en:'Will the ₹750 really come — what is the assurance?'},
+    ask:'For a CSP with money already pending against his name, what can we honestly say about the ₹750 arriving? This needs the credit TAT and a way for him to see it landed — the same ruling as when-750-credited.'},
+
+  { id:'anything-deducted', status:'pending', src:[],
+    q:{hi:'₹750 में से कुछ कटेगा तो नहीं?', en:'Will anything be deducted from the ₹750?'},
+    ask:'Does the full ₹750 reach the CSP, or is anything adjusted first (TDS, pending dues, carry fee)? Only ship this question if the answer is "पूरा ₹750 मिलेगा" — an unanswered deduction question in our own voice would plant a fear no CSP raised.'},
+
+  { id:'service-complaint-750-withheld', status:'pending', src:[],
+    q:{hi:'सर्विस की शिकायत आई तो ₹750 रुक जाएगा?', en:'If a service complaint comes, is the ₹750 held?'},
+    ask:'Can the ₹750 be held or reversed for any reason at all — service complaints, audit failure, suspected mis-selling? If it truly cannot, that is a strong trust line worth printing.'},
+
+  { id:'bonus-120-fix-first', status:'pending', src:[],
+    q:{hi:'मेरा ₹120 का बोनस पहले ठीक कराओ', en:'Fix my ₹120 bonus first'},
+    said:{hi:'₹120 का बोनस फिक्स कर दो, तो मैं ₹750 वाला प्लान लेने को तैयार हूँ',
+          en:'Fix the ₹120 bonus and I am ready to take the ₹750 plan'},
+    ask:'13 CSPs are holding the ₹750 hostage to the bonus. An FAQ cannot resolve a per-CSP account grievance — but staying silent reads as dodging. What is the honest line: is the bonus a separate program, is there a route to raise it, and does raising it block or delay the ₹750?'},
+
+  { id:'carry-fee-status', status:'pending', src:[],
+    q:{hi:'कैरी फ़ीस वाली बात का क्या हुआ?', en:'What happened about the carry fee?'},
+    ask:'Same as the bonus: what is the honest one-line acknowledgement, and where does a CSP take it? Roughly 120 CSPs spent their entire call on carry fee, bad leads and unpaid bonus and never reached the offer at all.'},
+
+  { id:'no-leads-what-use', status:'pending', src:[],
+    q:{hi:'लीड ही नहीं आ रही — ऑफ़र लेकर क्या करूँ?', en:'No leads are coming — what use is the offer?'},
+    ask:'For the 14 CSPs getting no leads: can we say plainly that opting in costs nothing until a connection is actually installed? That depends on your reversibility ruling — if opting in is irreversible, that line cannot be printed.'}
+  ]
+}
+
+]};
+</script>
+<script>
+(function(){
+  'use strict';
+
+  /* ── CSP ID rides through from the app link, and on to the offer page ── */
+  var params = new URLSearchParams(location.search);
+  var CSPID  = params.get('cspId') || params.get('cspid') || '';
+  var REVIEW = params.has('review') || /(^|[#&])review\b/.test(location.hash);
+  if (REVIEW) document.documentElement.classList.add('review');
+
+  var OFFER = 'https://vikaswiom.github.io/wiom-csp-750-pages/flow1.html'
+            + (CSPID ? '?cspId=' + encodeURIComponent(CSPID) : '');
+
+  var lang = (params.get('lang') === 'en') ? 'en' : 'hi';
+  var opened = {};          /* question id -> 1, for the dwell snapshot */
+  var openOrder = [];
+
+  /* ══════════════ Analytics (CleverTap, same shim as the offer page) ══════════════
+     FAQ750_Viewed          page opened
+     FAQ750_Searched        {q}         first three characters of a search
+     FAQ750_QuestionOpened  {id, cat, rank}
+     FAQ750_CtaClicked      {target:'offer'|'call'}
+     FAQ750_Closed          terminal — carries which questions were opened, in order,
+                            how many, the language, and seconds on page. This is the
+                            number that tells us which doubt actually dominates.
+  ═══════════════════════════════════════════════════════════════════════════════ */
+  var EV = 'FAQ750_', t0 = Date.now(), sent = {}, ended = false;
+  var DEBUG = (location.protocol === 'file:');
+  function ctPush(ev, props){
+    try{ if (window.CleverTap && typeof window.CleverTap.pushEvent === 'function'){
+      props ? window.CleverTap.pushEvent(ev, JSON.stringify(props)) : window.CleverTap.pushEvent(ev); return true; } }catch(e){}
+    try{ var wk = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap;
+      if (wk){ wk.postMessage({ action:'recordEventWithProps', event:ev, properties:props||{} }); return true; } }catch(e){}
+    return false;
+  }
+  function track(name, props){
+    props = props || {};
+    if (CSPID) props.csp_id = CSPID;
+    var ev = EV + name, key = ev + '|' + JSON.stringify(props);
+    if (sent[key]) return; sent[key] = 1;
+    if (DEBUG){ try{ console.log('[track]', ev, props); }catch(e){} }
+    var n = 0; (function go(){ n++; if (ctPush(ev, props)) return; if (n < 6) setTimeout(go, 250 * n); })();
+  }
+  function close(exit){
+    if (ended) return; ended = true;
+    track('Closed', {
+      opened_count: openOrder.length,
+      opened_ids: openOrder.join(','),
+      first_opened: openOrder[0] || '',
+      lang: lang,
+      seconds: Math.round((Date.now() - t0) / 1000),
+      exit: exit
+    });
+  }
+  window.addEventListener('pagehide', function(){ close('pagehide'); });
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'hidden') close('hidden');
+  });
+
+  /* ── Tiny helpers ── */
+  function el(tag, cls, html){
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+  function t(obj){ return (obj && obj[lang] != null) ? obj[lang] : (obj && obj.hi) || ''; }
+
+  var CHEV = '<svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  /* ── Flatten the question index once ── */
+  var INDEX = {};
+  FAQ.categories.forEach(function(cat){
+    cat.questions.forEach(function(q){ INDEX[q.id] = { q: q, cat: cat }; });
+  });
+
+  /* ══════════════ Render ══════════════ */
+  var root = document.getElementById('cats');
+
+  function renderAnswer(q){
+    var wrap = el('div', 'qans');
+    if (q.said) {
+      wrap.appendChild(el('p', 'said', '&ldquo;' + t(q.said) + '&rdquo;'));
+    }
+    if (q.status === 'pending') {
+      wrap.appendChild(el('span', 'pendbadge', lang === 'hi' ? 'जवाब आना बाकी' : 'ANSWER PENDING'));
+      wrap.appendChild(el('p', '', lang === 'hi'
+        ? 'यह सवाल पेज पर तभी दिखेगा जब जवाब तय हो जाएगा।'
+        : 'This question appears to CSPs only once the answer is settled.'));
+      wrap.appendChild(el('div', 'askline', '<b>' + (lang === 'hi' ? 'तय करना है: ' : 'Needs a ruling: ') + '</b>' + q.ask));
+    } else {
+      (q.a || []).forEach(function(block){
+        if (typeof block === 'object' && block.type === 'mini') {
+          var m = el('div', 'mini');
+          block.rows.forEach(function(r){
+            var row = el('div', r.total ? 'tot' : '');
+            row.appendChild(el('span', 'lab', t(r.label)));
+            row.appendChild(el('span', 'val' + (r.pink ? ' pink' : ''), t(r.value)));
+            m.appendChild(row);
+          });
+          wrap.appendChild(m);
+        } else if (typeof block === 'object' && block.type === 'note') {
+          wrap.appendChild(el('div', 'note' + (block.calm ? ' calm' : ''), t(block)));
+        } else if (typeof block === 'object' && block.type === 'cta') {
+          var ctaLink = el('a', 'ans-cta', t(block));
+          ctaLink.href = '#';
+          ctaLink.addEventListener('click', function(e){
+            e.preventDefault();
+            track('CtaClicked', { target: CSPID ? 'call' : 'call_no_cspid' });
+            if (CSPID) location.href = OFFER + (OFFER.indexOf('?') > -1 ? '&' : '?') + 'want=call';
+          });
+          wrap.appendChild(ctaLink);
+        } else {
+          wrap.appendChild(el('p', '', t(block)));
+        }
+      });
+    }
+    return wrap;
+  }
+
+  function renderQuestion(q, cat, rank){
+    var item = el('div', 'qitem' + (q.status === 'pending' ? ' pending' : ''));
+    item.id = 'q-' + q.id;
+    item.dataset.qid = q.id;
+
+    var btn = el('button', 'qbtn');
+    btn.type = 'button';
+    btn.setAttribute('aria-expanded', 'false');
+    btn.innerHTML = '<span class="qtext">' + t(q.q) + '</span>' + CHEV;
+    btn.addEventListener('click', function(){ toggle(item, cat, q, rank); });
+
+    item.appendChild(btn);
+    item.appendChild(renderAnswer(q));
+    return item;
+  }
+
+  function toggle(item, cat, q, rank, forceOpen){
+    var isOpen = item.classList.contains('open');
+    if (isOpen && forceOpen) return;
+    item.classList.toggle('open', forceOpen ? true : !isOpen);
+    var btn = item.querySelector('.qbtn');
+    btn.setAttribute('aria-expanded', item.classList.contains('open') ? 'true' : 'false');
+    if (item.classList.contains('open') && !opened[q.id]) {
+      opened[q.id] = 1; openOrder.push(q.id);
+      track('QuestionOpened', { id: q.id, cat: cat.id, rank: rank });
+    }
+  }
+
+  function visibleCount(cat){
+    return cat.questions.filter(function(q){ return REVIEW || q.status !== 'pending'; }).length;
+  }
+
+  function render(){
+    root.innerHTML = '';
+    FAQ.categories.forEach(function(cat){
+      /* A category whose every answer is still pending would render as a
+         header over nothing. Hide it until at least one answer lands. */
+      if (!visibleCount(cat)) return;
+      var sec = el('section', 'cat');
+      sec.id = 'cat-' + cat.id;
+
+      var head = el('div', 'cathead');
+      head.appendChild(el('div', 'icircle', cat.icon));
+      var ht = el('div');
+      ht.appendChild(el('h2', '', t(cat.title)));
+      ht.appendChild(el('p', '', t(cat.sub)));
+      head.appendChild(ht);
+      sec.appendChild(head);
+
+      var list = el('div', 'qlist');
+      cat.questions.forEach(function(q, i){ list.appendChild(renderQuestion(q, cat, i + 1)); });
+      sec.appendChild(list);
+      root.appendChild(sec);
+    });
+    paintStatic();
+  }
+
+  /* ── Static strings that live in the markup ── */
+  function paintStatic(){
+    document.querySelectorAll('[data-s]').forEach(function(n){
+      var v = S[lang][n.dataset.s];
+      if (v != null) n.innerHTML = v;
+    });
+    document.querySelectorAll('[data-sp]').forEach(function(n){
+      var v = S[lang][n.dataset.sp];
+      if (v != null) n.setAttribute('placeholder', v);
+    });
+    document.title = S[lang].docTitle;
+    document.documentElement.lang = (lang === 'hi' ? 'hi' : 'en');
+    paintCtas();
+    if (REVIEW) {
+      var pend = 0, live = 0;
+      FAQ.categories.forEach(function(c){
+        c.questions.forEach(function(q){ q.status === 'pending' ? pend++ : live++; });
+      });
+      document.querySelector('.reviewbar').innerHTML =
+        S[lang].reviewBar + ' &nbsp;·&nbsp; ' + live + ' ' + S[lang].reviewLive
+        + ', ' + pend + ' ' + S[lang].reviewPend;
+    }
+  }
+
+  /* ── Language toggle ── */
+  document.getElementById('langToggle').addEventListener('click', function(){
+    var openIds = openOrder.slice();
+    lang = (lang === 'hi' ? 'en' : 'hi');
+    render();
+    openIds.forEach(function(id){
+      var item = document.getElementById('q-' + id);
+      if (item) item.classList.add('open');
+    });
+  });
+
+  /* ── CTAs ──
+     The offer page refuses to open without a CSP ID. Forwarded on WhatsApp
+     this page loses it, so a reader with no cspId is sent to the app rather
+     than into that guard screen. */
+  var offerBtn = document.getElementById('offerCta');
+  var callBtn  = document.getElementById('callCta');
+
+  function paintCtas(){
+    if (CSPID) {
+      offerBtn.setAttribute('href', OFFER);
+      offerBtn.innerHTML = S[lang].offerCta;
+      callBtn.innerHTML  = S[lang].helpCta;
+    } else {
+      offerBtn.removeAttribute('href');
+      offerBtn.setAttribute('role', 'button');
+      offerBtn.innerHTML = S[lang].offerCtaNoId;
+      callBtn.innerHTML  = S[lang].helpCtaNoId;
+    }
+  }
+  offerBtn.addEventListener('click', function(){
+    track('CtaClicked', { target: CSPID ? 'offer' : 'no_cspid' });
+  });
+  callBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    track('CtaClicked', { target: CSPID ? 'call' : 'call_no_cspid' });
+    if (CSPID) location.href = OFFER + (OFFER.indexOf('?') > -1 ? '&' : '?') + 'want=call';
+  });
+
+  /* ── Boot ── */
+  render();
+  track('Viewed', {});
+
+  /* Deep link: #q-<id> opens that one answer — a tele-caller can send a
+     single question over WhatsApp and it lands open. */
+  if (location.hash.indexOf('#q-') === 0 && !REVIEW) {
+    var id = location.hash.slice(3);
+    setTimeout(function(){
+      var item = document.getElementById('q-' + id);
+      if (!item) return;
+      var hit = INDEX[id];
+      toggle(item, hit.cat, hit.q, 0, true);
+      item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 120);
+  }
+})();
+
+  /* ── Back ──
+     Reached from the flow page's "जरूरी सवालों के जवाब" button, so history
+     takes the CSP back where they were. Opened cold (WhatsApp forward), fall
+     back to the offer page — or stay put if there is no CSP ID to carry. */
+  (function(){
+    var b = document.getElementById('backBtn');
+    if (!b) return;
+    b.addEventListener('click', function(e){
+      e.preventDefault();
+      if (history.length > 1) { history.back(); return; }
+      if (CSPID) { location.href = OFFER; }
+    });
+  })();
+</script>

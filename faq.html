@@ -1194,7 +1194,6 @@ categories: [
       new Image().src = 'https://script.google.com/macros/s/AKfycbw770KNFn3SnpKbRwtLbPe8MJu8dpDXwau6UY-JTfcbA8Y0T2ZRyoGRRMhi4k8WTAo2/exec'
         + '?flow=P750CALL&screen=' + encodeURIComponent('faq_' + lang)
         + '&uid=' + encodeURIComponent(id)
-        + '&src=' + encodeURIComponent(String(source).substring(0, 40))
         + '&t=' + (+new Date());
     } catch (err) {}
     track('CtaClicked', { target: CSPID ? 'call' : 'call_no_cspid', source: source });

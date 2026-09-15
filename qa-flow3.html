@@ -1089,7 +1089,6 @@
         + '?flow=P750CALL'
         + '&screen=' + encodeURIComponent(P750_PAGE + '_' + lg)
         + '&uid=' + encodeURIComponent(id)
-        + '&src=' + encodeURIComponent(where || 'choice')
         + '&t=' + (+new Date());
     } catch (e) {}
     try { track('Progress', { milestone: 'callback_requested' }); } catch (e) {}

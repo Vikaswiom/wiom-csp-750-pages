@@ -1190,7 +1190,7 @@ categories: [
     /* EVERY call CTA writes its own row, tagged with where it was tapped —
        that is how we learn which question actually drives call requests.
        The sheet dedups per CSP, so repeat taps bump a counter, not the list. */
-    sheetBeacon('https://script.google.com/macros/s/AKfycbzpJ5R_TtfAeyjb04775eoFFwTvHza0nCoX_Oa5knETWmzZQs0-JpGQJPjIIO1dnrEn/exec'
+    sheetBeacon('https://script.google.com/macros/s/AKfycbzoETDCLj11-R8D17i7D17y6z5w2gVVeYCRLogaoWCnfQc-SJ-dlbM2piIhfB68ecS9/exec'
       + '?flow=P750CALL&screen=' + encodeURIComponent('faq_' + lang)
       + '&uid=' + encodeURIComponent(id)
       + '&t=' + (+new Date()));
@@ -1208,7 +1208,7 @@ categories: [
   track('Viewed', {});
 
   /* Visit log: one beacon on load; the sheet dedups per CSP per page per day. */
-  sheetBeacon('https://script.google.com/macros/s/AKfycbzpJ5R_TtfAeyjb04775eoFFwTvHza0nCoX_Oa5knETWmzZQs0-JpGQJPjIIO1dnrEn/exec'
+  sheetBeacon('https://script.google.com/macros/s/AKfycbzoETDCLj11-R8D17i7D17y6z5w2gVVeYCRLogaoWCnfQc-SJ-dlbM2piIhfB68ecS9/exec'
     + '?flow=P750VIEW&screen=' + encodeURIComponent('faq_' + lang)
     + '&vid=' + encodeURIComponent(CSPID || 'unknown')
     + '&t=' + (+new Date()));

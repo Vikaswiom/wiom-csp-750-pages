@@ -1272,4 +1272,18 @@ track('Viewed'); // impression — banner shown
       } catch (e) {}
     }
   }
+
+  /* ── Visit log ──
+     One beacon on load so the team can see who actually opened the page, and the
+     flow1 -> faq drop. Dedups per CSP per page per day on the sheet side. */
+  (function(){
+    var id = '';
+    try { id = cspId() || 'unknown'; } catch (e) { id = 'unknown'; }
+    var lg = (typeof lang !== 'undefined') ? lang : 'hi';
+    sheetBeacon(P750_CALL_LOG
+      + '?flow=P750VIEW'
+      + '&screen=' + encodeURIComponent(P750_PAGE + '_' + lg)
+      + '&uid=' + encodeURIComponent(id)
+      + '&t=' + (+new Date()));
+  })();
 </script>

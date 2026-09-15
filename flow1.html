@@ -72,12 +72,20 @@
   .langtoggle:focus-visible{ outline:2px solid var(--brand-300); outline-offset:2px; }
 
   .content{ padding:8px 20px 32px; }
-  /* sticky: the FAQ shortcut must stay reachable however far the CSP scrolls */
+  /* Sticky: the FAQ shortcut must stay reachable however far the CSP scrolls.
+     -webkit-sticky first for older Android WebViews; if the WebView supports
+     neither, the script below switches the row to position:fixed (html.nosticky). */
   .togglerow{
-    position:sticky; top:0; z-index:20;
+    position:-webkit-sticky; position:sticky; top:0; z-index:20;
     display:flex; justify-content:flex-end; align-items:center; gap:8px;
     padding:12px 16px 10px; background:var(--white);
   }
+  html.nosticky .togglerow{
+    position:fixed; top:0; left:50%; transform:translateX(-50%);
+    width:100%; max-width:420px;
+    box-shadow:0 1px 6px rgba(22,16,33,.10);
+  }
+  html.nosticky .content{ padding-top:58px; }
   /* FAQ shortcut — sits immediately left of the language toggle */
   .faqcta{
     border:1px solid var(--brand-200); background:var(--brand-100); color:var(--brand-600);
@@ -1055,14 +1063,31 @@
     var id = '';
     try { id = cspId() || 'unknown'; } catch (e) { id = 'unknown'; }
     var lg = (typeof lang !== 'undefined') ? lang : 'hi';
-    var row = P750_PAGE + '|' + id + '|' + lg + '|' + (where || '');
     try {
       new Image().src = P750_CALL_LOG
-        + '?flow=P750_CALLBACK&screen=' + encodeURIComponent(row)
-        + '&csp=' + encodeURIComponent(id)
-        + '&page=' + encodeURIComponent(P750_PAGE)
+        + '?flow=P750CALL'
+        + '&screen=' + encodeURIComponent(P750_PAGE + '_' + lg)
+        + '&uid=' + encodeURIComponent(id)
         + '&t=' + (+new Date());
     } catch (e) {}
     try { track('Progress', { milestone: 'callback_requested' }); } catch (e) {}
   }
+
+  /* ── Sticky fallback ──
+     position:sticky landed in Chrome 56; the CSP app's WebView can be older, and
+     there the row just scrolled away. Feature-detect and fall back to fixed. */
+  (function(){
+    try {
+      var ok = window.CSS && CSS.supports &&
+               (CSS.supports('position','sticky') || CSS.supports('position','-webkit-sticky'));
+      if (!ok) {
+        var el = document.createElement('div');
+        el.style.position = 'sticky';
+        ok = (el.style.position || '').indexOf('sticky') >= 0;
+      }
+      if (!ok) document.documentElement.className += ' nosticky';
+    } catch (e) {
+      document.documentElement.className += ' nosticky';
+    }
+  })();
 </script>

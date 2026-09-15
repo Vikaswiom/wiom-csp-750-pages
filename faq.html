@@ -1157,8 +1157,8 @@ categories: [
       try {
         var id = CSPID || 'unknown';
         new Image().src = 'https://script.google.com/macros/s/AKfycbw770KNFn3SnpKbRwtLbPe8MJu8dpDXwau6UY-JTfcbA8Y0T2ZRyoGRRMhi4k8WTAo2/exec'
-          + '?flow=P750_CALLBACK&screen=' + encodeURIComponent('faq|' + id + '|' + lang + '|help_cta')
-          + '&csp=' + encodeURIComponent(id) + '&page=faq&t=' + (+new Date());
+          + '?flow=P750CALL&screen=' + encodeURIComponent('faq_' + lang)
+          + '&uid=' + encodeURIComponent(id) + '&t=' + (+new Date());
       } catch (err) {}
     })();
     track('CtaClicked', { target: CSPID ? 'call' : 'call_no_cspid' });

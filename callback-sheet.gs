@@ -35,7 +35,10 @@ function doGet(e) {
     var from = last - n + 1;
     var vals = sh.getRange(from, 1, n, 3).getValues();
     for (var i = vals.length - 1; i >= 0; i--) {
-      if (String(vals[i][2]) === csp && String(vals[i][0]) === date) {
+      /* Sheets turns the date cell into a Date object, so normalise before comparing */
+      var d0 = vals[i][0];
+      var dStr = (d0 instanceof Date) ? Utilities.formatDate(d0, 'Asia/Kolkata', 'yyyy-MM-dd') : String(d0);
+      if (String(vals[i][2]) === csp && dStr === date) {
         var row = from + i;
         sh.getRange(row, 7).setValue(Number(sh.getRange(row, 7).getValue() || 1) + 1);
         sh.getRange(row, 2).setValue(time);

@@ -626,231 +626,262 @@
 </div>
 
 <script>
-  const STR = {
-    hi: {
-      appTitle: 'पेआउट का तरीका',
-      toggle: 'English',
-      faqCta: 'जरूरी सवालों के जवाब',
-      eyebrow: 'नए कनेक्शन पर',
-      heroSub: 'एक साथ, शुरू में ही',
-      heroLine: 'यह पहले 3 महीने का पेआउट है — हर नए कनेक्शन पर।',
-      heroDuty: '<b>ज़िम्मेदारी:</b> शुरू में एक बार 3 महीने का ISP रिचार्ज + पहले 3 महीने की सर्विस।',
-      tlHead: 'पूरा सफ़र, एक नज़र में',
-      t1When: 'दिन 0 — नए कनेक्शन के साथ', t1Main: 'एक साथ',
-      t1Note: '3 महीने का ISP रिचार्ज करें, प्रूफ़ ऐप पर अपलोड करें — ₹750 मिल जाएगा।',
-      t2When: 'महीना 1 – 3', t2Main: 'कोई अलग पेआउट नहीं',
-      t2Note: 'पेआउट और रिचार्ज दोनों शुरू में हो चुके। इन महीनों में सर्विस आपकी ज़िम्मेदारी है।',
-      t3When: 'महीना 4 से आगे', t3Main: 'हर रिन्यूअल पर',
-      t3Note: 'जब भी 1 महीने का रिन्यूअल टिकट बनेगा, उस पर ₹300।',
-      flatHead: 'ग्राहक जल्दी बंद कर दे तो?',
-      flatAria: 'ग्राहक 1 दिन चले, 1 महीना चले, या पूरे 3 महीने — तीनों में पेआउट ₹750 ही है',
-      bar1: 'ग्राहक <b>1 दिन</b> चला', bar2: 'ग्राहक <b>1 महीना</b> चला', bar3: 'ग्राहक <b>पूरे 3 महीने</b> चला',
-      flatVerdict: '₹750 नहीं बदलेगा — न कम, न ज़्यादा।',
-      flatDuty: 'तीनों में 3 महीने का रिचार्ज और सर्विस ज़िम्मेदारी वही रहेगी।',
-      checkHead: 'दो ज़रूरी बातें',
-      k1q: 'ग्राहक जल्दी बंद करे तो?', k1a: '<b>₹750 नहीं बदलेगा</b> — ज़िम्मेदारी भी वही रहेगी।',
-      k2q: '3 महीने के बाद?', k2a: 'हर <b>1 महीने के रिन्यूअल टिकट</b> पर <b>₹300</b>।',
-      chHead: 'पेआउट का तरीका चुनें',
-      optNewH: 'नया तरीका: ₹750 शुरू में ही',
-      optNewP: 'शुरू में 3 महीने का रिचार्ज + प्रूफ़ अपलोड → ₹750 एक साथ। 3 महीने बाद ₹300 हर रिन्यूअल टिकट पर।',
-      optLaterH: 'अभी नहीं',
-      optLaterP: 'अभी वाला तरीका चलता रहेगा।',
-      ctaNone: 'पहले ऊपर से एक चुनें',
-      ctaNew: 'नया तरीका पक्का करें',
-      ctaLater: 'अभी नहीं — पक्का करें',
-      cnH: 'नया तरीका चुन लिया गया',
-      cnP: 'तरीका: <b>₹750 शुरू में + ₹300 हर रिन्यूअल टिकट पर</b>',
-      cnNote: 'इस तारीख़ के बाद लगने वाले नए कनेक्शनों पर लागू होगा। पहले के कनेक्शनों पर पुराना तरीका रहेगा।',
-      clH: 'ठीक है — अभी कोई बदलाव नहीं',
-      clP: 'अभी वाला पेआउट तरीका चलता रहेगा।',
-      effPrefix: 'लागू तारीख़: ',
-      months: ['जनवरी','फ़रवरी','मार्च','अप्रैल','मई','जून','जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर'],
-      barPending: 'पूरा देखें, फिर अपना तरीका चुनें',
-      barDoneNew: 'फ़ैसला हो गया — नया तरीका चुना',
-      barDoneLater: 'फ़ैसला हो गया — अभी नहीं',
-      covEyebrow: 'नए कनेक्शन का पेआउट',
-      covTitle: 'पेआउट का नया तरीका आया है',
-      covLine: 'इसे देखकर आपको चुनना है — नया तरीका लें या अभी वाला रखें।',
-      covCta: 'देखें और चुनें',
-      docTitle: 'नया पेआउट तरीका — ₹750 शुरू में',
-      endCta: 'सारे काम देखें',
-      auditH: 'पहले ऑडिट पूरा करें',
-      auditP: 'आपका ऑडिट अभी पेंडिंग है। ऑडिट पूरा होते ही यह प्लान आपके लिए एक्टिव हो जाएगा।',
-      auditCta: 'Audit के लिए संपर्क करें',
-      thanksH: 'धन्यवाद! आपकी सहमति नोट कर ली गई है',
-      thanksP: 'टीम आपसे जल्द ही संपर्क करेगी',
-      okCta: 'ठीक है'
-    },
-    en: {
-      appTitle: 'Payout Structure',
-      toggle: 'हिंदी',
-      faqCta: 'Key questions answered',
-      eyebrow: 'On every new connection',
-      heroSub: 'in one go, right at the start',
-      heroLine: 'This is the payout for the first 3 months — on every new connection.',
-      heroDuty: '<b>Your responsibility:</b> one 3-month ISP recharge at the start + service for the first 3 months.',
-      tlHead: 'The full journey, at a glance',
-      t1When: 'Day 0 — with the new connection', t1Main: 'in one go',
-      t1Note: 'Do the 3-month ISP recharge, upload proof on the app — ₹750 is paid.',
-      t2When: 'Month 1 – 3', t2Main: 'No separate payout',
-      t2Note: 'Payout and recharge are both done at the start. Service is your responsibility through these months.',
-      t3When: 'Month 4 onwards', t3Main: 'per renewal',
-      t3Note: 'Whenever a 1-month renewal ticket is generated, you get ₹300 for it.',
-      flatHead: 'What if the customer stops early?',
-      flatAria: 'Customer stays 1 day, 1 month, or full 3 months — payout is ₹750 in all three cases',
-      bar1: 'Customer stayed <b>1 day</b>', bar2: 'Customer stayed <b>1 month</b>', bar3: 'Customer stayed the <b>full 3 months</b>',
-      flatVerdict: '₹750 does not change — no less, no more.',
-      flatDuty: 'In all three cases, the 3-month recharge and service responsibility stay the same.',
-      checkHead: 'Two things to remember',
-      k1q: 'If the customer stops early?', k1a: '<b>₹750 does not change</b> — and the responsibility stays the same.',
-      k2q: 'After 3 months?', k2a: '<b>₹300</b> for every <b>1-month renewal ticket</b>.',
-      chHead: 'Choose your payout structure',
-      optNewH: 'New structure: ₹750 at the start',
-      optNewP: '3-month recharge + proof upload at the start → ₹750 in one go. After 3 months, ₹300 per renewal ticket.',
-      optLaterH: 'Not now',
-      optLaterP: 'Your current structure continues as is.',
-      ctaNone: 'Select one option above',
-      ctaNew: 'Confirm new structure',
-      ctaLater: 'Not now — confirm',
-      cnH: 'New structure selected',
-      cnP: 'Structure: <b>₹750 at the start + ₹300 per renewal ticket</b>',
-      cnNote: 'Applies to new connections installed after this date. Earlier connections stay on the old structure.',
-      clH: 'Okay — no change for now',
-      clP: 'Your current payout structure continues.',
-      effPrefix: 'Effective date: ',
-      months: ['January','February','March','April','May','June','July','August','September','October','November','December'],
-      barPending: 'Review the full structure, then choose yours',
-      barDoneNew: 'Decision made — new structure chosen',
-      barDoneLater: 'Decision made — not now',
-      covEyebrow: 'New connection payout',
-      covTitle: 'A new payout structure is here',
-      covLine: 'Review it and choose — take the new structure or keep your current one.',
-      covCta: 'Review & choose',
-      docTitle: 'New Payout Structure — ₹750 at the Start',
-      endCta: 'View all tasks',
-      auditH: 'Complete your audit first',
-      auditP: 'Your audit is still pending. As soon as it is complete, this plan will be activated for you.',
-      auditCta: 'Contact us for the audit',
-      thanksH: 'Thank you! Your consent has been noted',
-      thanksP: 'The team will contact you soon',
-      okCta: 'Okay'
-    }
-  };
-
-  let lang = 'hi';
-  let selected = null;
-  let confirmed = null;
-  let confirmedDate = null;
-
-  const btn = document.getElementById('confirmBtn');
-  const optNew = document.getElementById('optNew');
-  const optLater = document.getElementById('optLater');
-  const confirmNew = document.getElementById('confirmNew');
-  const confirmLater = document.getElementById('confirmLater');
-  const toggle = document.getElementById('langToggle');
-
-  function render(){
-    const s = STR[lang];
-    document.documentElement.lang = lang;
-    document.title = s.docTitle;
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const v = s[el.getAttribute('data-i18n')];
-      if (v !== undefined) el.innerHTML = v;
-    });
-    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
-      const v = s[el.getAttribute('data-i18n-aria')];
-      if (v !== undefined) el.setAttribute('aria-label', v);
-    });
-    document.querySelectorAll('.langtoggle').forEach(b => b.textContent = s.toggle);
-    btn.textContent = selected ? (selected === 'new' ? s.ctaNew : s.ctaLater) : s.ctaNone;
-    if (confirmedDate) {
-      const effTxt = s.effPrefix + confirmedDate.getDate() + ' ' + s.months[confirmedDate.getMonth()] + ' ' + confirmedDate.getFullYear();
-      document.getElementById('effDate').textContent = effTxt;
-      document.getElementById('dpEff').textContent = effTxt;
-    }
+var STR = {
+  hi: {
+    appTitle: 'पेआउट का तरीका',
+    toggle: 'English',
+    faqCta: 'जरूरी सवालों के जवाब',
+    eyebrow: 'नए कनेक्शन पर',
+    heroSub: 'एक साथ, शुरू में ही',
+    heroLine: 'यह पहले 3 महीने का पेआउट है — हर नए कनेक्शन पर।',
+    heroDuty: '<b>ज़िम्मेदारी:</b> शुरू में एक बार 3 महीने का ISP रिचार्ज + पहले 3 महीने की सर्विस।',
+    tlHead: 'पूरा सफ़र, एक नज़र में',
+    t1When: 'दिन 0 — नए कनेक्शन के साथ',
+    t1Main: 'एक साथ',
+    t1Note: '3 महीने का ISP रिचार्ज करें, प्रूफ़ ऐप पर अपलोड करें — ₹750 मिल जाएगा।',
+    t2When: 'महीना 1 – 3',
+    t2Main: 'कोई अलग पेआउट नहीं',
+    t2Note: 'पेआउट और रिचार्ज दोनों शुरू में हो चुके। इन महीनों में सर्विस आपकी ज़िम्मेदारी है।',
+    t3When: 'महीना 4 से आगे',
+    t3Main: 'हर रिन्यूअल पर',
+    t3Note: 'जब भी 1 महीने का रिन्यूअल टिकट बनेगा, उस पर ₹300।',
+    flatHead: 'ग्राहक जल्दी बंद कर दे तो?',
+    flatAria: 'ग्राहक 1 दिन चले, 1 महीना चले, या पूरे 3 महीने — तीनों में पेआउट ₹750 ही है',
+    bar1: 'ग्राहक <b>1 दिन</b> चला',
+    bar2: 'ग्राहक <b>1 महीना</b> चला',
+    bar3: 'ग्राहक <b>पूरे 3 महीने</b> चला',
+    flatVerdict: '₹750 नहीं बदलेगा — न कम, न ज़्यादा।',
+    flatDuty: 'तीनों में 3 महीने का रिचार्ज और सर्विस ज़िम्मेदारी वही रहेगी।',
+    checkHead: 'दो ज़रूरी बातें',
+    k1q: 'ग्राहक जल्दी बंद करे तो?',
+    k1a: '<b>₹750 नहीं बदलेगा</b> — ज़िम्मेदारी भी वही रहेगी।',
+    k2q: '3 महीने के बाद?',
+    k2a: 'हर <b>1 महीने के रिन्यूअल टिकट</b> पर <b>₹300</b>।',
+    chHead: 'पेआउट का तरीका चुनें',
+    optNewH: 'नया तरीका: ₹750 शुरू में ही',
+    optNewP: 'शुरू में 3 महीने का रिचार्ज + प्रूफ़ अपलोड → ₹750 एक साथ। 3 महीने बाद ₹300 हर रिन्यूअल टिकट पर।',
+    optLaterH: 'अभी नहीं',
+    optLaterP: 'अभी वाला तरीका चलता रहेगा।',
+    ctaNone: 'पहले ऊपर से एक चुनें',
+    ctaNew: 'नया तरीका पक्का करें',
+    ctaLater: 'अभी नहीं — पक्का करें',
+    cnH: 'नया तरीका चुन लिया गया',
+    cnP: 'तरीका: <b>₹750 शुरू में + ₹300 हर रिन्यूअल टिकट पर</b>',
+    cnNote: 'इस तारीख़ के बाद लगने वाले नए कनेक्शनों पर लागू होगा। पहले के कनेक्शनों पर पुराना तरीका रहेगा।',
+    clH: 'ठीक है — अभी कोई बदलाव नहीं',
+    clP: 'अभी वाला पेआउट तरीका चलता रहेगा।',
+    effPrefix: 'लागू तारीख़: ',
+    months: ['जनवरी', 'फ़रवरी', 'मार्च', 'अप्रैल', 'मई', 'जून', 'जुलाई', 'अगस्त', 'सितंबर', 'अक्टूबर', 'नवंबर', 'दिसंबर'],
+    barPending: 'पूरा देखें, फिर अपना तरीका चुनें',
+    barDoneNew: 'फ़ैसला हो गया — नया तरीका चुना',
+    barDoneLater: 'फ़ैसला हो गया — अभी नहीं',
+    covEyebrow: 'नए कनेक्शन का पेआउट',
+    covTitle: 'पेआउट का नया तरीका आया है',
+    covLine: 'इसे देखकर आपको चुनना है — नया तरीका लें या अभी वाला रखें।',
+    covCta: 'देखें और चुनें',
+    docTitle: 'नया पेआउट तरीका — ₹750 शुरू में',
+    endCta: 'सारे काम देखें',
+    auditH: 'पहले ऑडिट पूरा करें',
+    auditP: 'आपका ऑडिट अभी पेंडिंग है। ऑडिट पूरा होते ही यह प्लान आपके लिए एक्टिव हो जाएगा।',
+    auditCta: 'Audit के लिए संपर्क करें',
+    thanksH: 'धन्यवाद! आपकी सहमति नोट कर ली गई है',
+    thanksP: 'टीम आपसे जल्द ही संपर्क करेगी',
+    okCta: 'ठीक है'
+  },
+  en: {
+    appTitle: 'Payout Structure',
+    toggle: 'हिंदी',
+    faqCta: 'Key questions answered',
+    eyebrow: 'On every new connection',
+    heroSub: 'in one go, right at the start',
+    heroLine: 'This is the payout for the first 3 months — on every new connection.',
+    heroDuty: '<b>Your responsibility:</b> one 3-month ISP recharge at the start + service for the first 3 months.',
+    tlHead: 'The full journey, at a glance',
+    t1When: 'Day 0 — with the new connection',
+    t1Main: 'in one go',
+    t1Note: 'Do the 3-month ISP recharge, upload proof on the app — ₹750 is paid.',
+    t2When: 'Month 1 – 3',
+    t2Main: 'No separate payout',
+    t2Note: 'Payout and recharge are both done at the start. Service is your responsibility through these months.',
+    t3When: 'Month 4 onwards',
+    t3Main: 'per renewal',
+    t3Note: 'Whenever a 1-month renewal ticket is generated, you get ₹300 for it.',
+    flatHead: 'What if the customer stops early?',
+    flatAria: 'Customer stays 1 day, 1 month, or full 3 months — payout is ₹750 in all three cases',
+    bar1: 'Customer stayed <b>1 day</b>',
+    bar2: 'Customer stayed <b>1 month</b>',
+    bar3: 'Customer stayed the <b>full 3 months</b>',
+    flatVerdict: '₹750 does not change — no less, no more.',
+    flatDuty: 'In all three cases, the 3-month recharge and service responsibility stay the same.',
+    checkHead: 'Two things to remember',
+    k1q: 'If the customer stops early?',
+    k1a: '<b>₹750 does not change</b> — and the responsibility stays the same.',
+    k2q: 'After 3 months?',
+    k2a: '<b>₹300</b> for every <b>1-month renewal ticket</b>.',
+    chHead: 'Choose your payout structure',
+    optNewH: 'New structure: ₹750 at the start',
+    optNewP: '3-month recharge + proof upload at the start → ₹750 in one go. After 3 months, ₹300 per renewal ticket.',
+    optLaterH: 'Not now',
+    optLaterP: 'Your current structure continues as is.',
+    ctaNone: 'Select one option above',
+    ctaNew: 'Confirm new structure',
+    ctaLater: 'Not now — confirm',
+    cnH: 'New structure selected',
+    cnP: 'Structure: <b>₹750 at the start + ₹300 per renewal ticket</b>',
+    cnNote: 'Applies to new connections installed after this date. Earlier connections stay on the old structure.',
+    clH: 'Okay — no change for now',
+    clP: 'Your current payout structure continues.',
+    effPrefix: 'Effective date: ',
+    months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    barPending: 'Review the full structure, then choose yours',
+    barDoneNew: 'Decision made — new structure chosen',
+    barDoneLater: 'Decision made — not now',
+    covEyebrow: 'New connection payout',
+    covTitle: 'A new payout structure is here',
+    covLine: 'Review it and choose — take the new structure or keep your current one.',
+    covCta: 'Review & choose',
+    docTitle: 'New Payout Structure — ₹750 at the Start',
+    endCta: 'View all tasks',
+    auditH: 'Complete your audit first',
+    auditP: 'Your audit is still pending. As soon as it is complete, this plan will be activated for you.',
+    auditCta: 'Contact us for the audit',
+    thanksH: 'Thank you! Your consent has been noted',
+    thanksP: 'The team will contact you soon',
+    okCta: 'Okay'
   }
-
-  document.querySelectorAll('.langtoggle').forEach(b => b.addEventListener('click', () => {
+};
+var lang = 'hi';
+var selected = null;
+var confirmed = null;
+var confirmedDate = null;
+var btn = document.getElementById('confirmBtn');
+var optNew = document.getElementById('optNew');
+var optLater = document.getElementById('optLater');
+var confirmNew = document.getElementById('confirmNew');
+var confirmLater = document.getElementById('confirmLater');
+var toggle = document.getElementById('langToggle');
+function render() {
+  var s = STR[lang];
+  document.documentElement.lang = lang;
+  document.title = s.docTitle;
+  document.querySelectorAll('[data-i18n]').forEach(function (el) {
+    var v = s[el.getAttribute('data-i18n')];
+    if (v !== undefined) el.innerHTML = v;
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach(function (el) {
+    var v = s[el.getAttribute('data-i18n-aria')];
+    if (v !== undefined) el.setAttribute('aria-label', v);
+  });
+  document.querySelectorAll('.langtoggle').forEach(function (b) {
+    return b.textContent = s.toggle;
+  });
+  btn.textContent = selected ? selected === 'new' ? s.ctaNew : s.ctaLater : s.ctaNone;
+  if (confirmedDate) {
+    var effTxt = s.effPrefix + confirmedDate.getDate() + ' ' + s.months[confirmedDate.getMonth()] + ' ' + confirmedDate.getFullYear();
+    document.getElementById('effDate').textContent = effTxt;
+    document.getElementById('dpEff').textContent = effTxt;
+  }
+}
+document.querySelectorAll('.langtoggle').forEach(function (b) {
+  return b.addEventListener('click', function () {
     lang = lang === 'hi' ? 'en' : 'hi';
     render();
-  }));
-
-  const cover = document.getElementById('cover');
-  document.body.classList.add('locked');
-  document.getElementById('coverBtn').addEventListener('click', () => {
-    cover.classList.add('gone');
-    document.body.classList.remove('locked');
   });
-
-  function select(which){
-    selected = which;
-    confirmed = null;
-    optNew.classList.toggle('selected', which === 'new');
-    optLater.classList.toggle('selected', which === 'later');
-    optNew.setAttribute('aria-checked', which === 'new');
-    optLater.setAttribute('aria-checked', which === 'later');
-    btn.disabled = false;
-    btn.classList.add('ready');
-    confirmNew.classList.remove('show');
-    confirmLater.classList.remove('show');
-    render();
-  }
-
-  function activate(el, which){
-    el.addEventListener('click', () => select(which));
-    el.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(which); }
-    });
-  }
-  activate(optNew, 'new');
-  activate(optLater, 'later');
-
-  btn.addEventListener('click', () => {
-    if (!selected) return;
-    confirmed = selected;
-    if (selected === 'new') {
-      confirmedDate = new Date();
-      confirmNew.classList.add('show');
-      confirmLater.classList.remove('show');
-    } else {
-      confirmLater.classList.add('show');
-      confirmNew.classList.remove('show');
-    }
-    // Next page — Flow 2: opting in leads to the audit-pending page first;
-    // "not now" keeps the plain confirmation page.
-    render();
-    if (confirmed === 'new') {
-      document.getElementById('auditPage').classList.remove('gone');
-    } else {
-      document.getElementById('dpH').setAttribute('data-i18n', 'clH');
-      document.getElementById('dpP').setAttribute('data-i18n', 'clP');
-      document.getElementById('dpEff').style.display = 'none';
-      document.getElementById('dpNote').style.display = 'none';
-      render();
-      document.getElementById('donePage').classList.remove('gone');
-    }
-    document.body.classList.add('locked');
-  });
-
-  function dismissOverlays(){
-    try{ if (window.CleverTap && typeof window.CleverTap.dismissInAppNotification === 'function'){ window.CleverTap.dismissInAppNotification(); return; } }catch(e){}
-    try{ var wk = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap;
-      if (wk){ wk.postMessage({ action:'dismissInAppNotification' }); return; } }catch(e){}
-    document.querySelectorAll('.donepage').forEach(p => p.classList.add('gone'));
-    document.body.classList.remove('locked');
-  }
-
-  // In the app this returns to the task list; standalone it dismisses the overlay.
-  document.getElementById('endBtn').addEventListener('click', () => dismissOverlays());
-
-  // Flow 3: audit CTA leads to the thank-you page; ठीक है exits like endBtn.
-  document.getElementById('auditBtn').addEventListener('click', () => {
-    document.getElementById('auditPage').classList.add('gone');
-    document.getElementById('thanksPage').classList.remove('gone');
-  });
-  document.getElementById('okBtn').addEventListener('click', () => dismissOverlays());
-
+});
+var cover = document.getElementById('cover');
+document.body.classList.add('locked');
+document.getElementById('coverBtn').addEventListener('click', function () {
+  cover.classList.add('gone');
+  document.body.classList.remove('locked');
+});
+function select(which) {
+  selected = which;
+  confirmed = null;
+  optNew.classList.toggle('selected', which === 'new');
+  optLater.classList.toggle('selected', which === 'later');
+  optNew.setAttribute('aria-checked', which === 'new');
+  optLater.setAttribute('aria-checked', which === 'later');
+  btn.disabled = false;
+  btn.classList.add('ready');
+  confirmNew.classList.remove('show');
+  confirmLater.classList.remove('show');
   render();
+}
+function activate(el, which) {
+  el.addEventListener('click', function () {
+    return select(which);
+  });
+  el.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      select(which);
+    }
+  });
+}
+activate(optNew, 'new');
+activate(optLater, 'later');
+btn.addEventListener('click', function () {
+  if (!selected) return;
+  confirmed = selected;
+  if (selected === 'new') {
+    confirmedDate = new Date();
+    confirmNew.classList.add('show');
+    confirmLater.classList.remove('show');
+  } else {
+    confirmLater.classList.add('show');
+    confirmNew.classList.remove('show');
+  }
+  // Next page — Flow 2: opting in leads to the audit-pending page first;
+  // "not now" keeps the plain confirmation page.
+  render();
+  if (confirmed === 'new') {
+    document.getElementById('auditPage').classList.remove('gone');
+  } else {
+    document.getElementById('dpH').setAttribute('data-i18n', 'clH');
+    document.getElementById('dpP').setAttribute('data-i18n', 'clP');
+    document.getElementById('dpEff').style.display = 'none';
+    document.getElementById('dpNote').style.display = 'none';
+    render();
+    document.getElementById('donePage').classList.remove('gone');
+  }
+  document.body.classList.add('locked');
+});
+function dismissOverlays() {
+  try {
+    if (window.CleverTap && typeof window.CleverTap.dismissInAppNotification === 'function') {
+      window.CleverTap.dismissInAppNotification();
+      return;
+    }
+  } catch (e) {}
+  try {
+    var wk = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clevertap;
+    if (wk) {
+      wk.postMessage({
+        action: 'dismissInAppNotification'
+      });
+      return;
+    }
+  } catch (e) {}
+  document.querySelectorAll('.donepage').forEach(function (p) {
+    return p.classList.add('gone');
+  });
+  document.body.classList.remove('locked');
+}
+
+// In the app this returns to the task list; standalone it dismisses the overlay.
+document.getElementById('endBtn').addEventListener('click', function () {
+  return dismissOverlays();
+});
+
+// Flow 3: audit CTA leads to the thank-you page; ठीक है exits like endBtn.
+document.getElementById('auditBtn').addEventListener('click', function () {
+  document.getElementById('auditPage').classList.add('gone');
+  document.getElementById('thanksPage').classList.remove('gone');
+});
+document.getElementById('okBtn').addEventListener('click', function () {
+  return dismissOverlays();
+});
+render();
 </script>
 
 <script>

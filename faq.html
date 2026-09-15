@@ -1210,7 +1210,7 @@ categories: [
   /* Visit log: one beacon on load; the sheet dedups per CSP per page per day. */
   sheetBeacon('https://script.google.com/macros/s/AKfycbzpJ5R_TtfAeyjb04775eoFFwTvHza0nCoX_Oa5knETWmzZQs0-JpGQJPjIIO1dnrEn/exec'
     + '?flow=P750VIEW&screen=' + encodeURIComponent('faq_' + lang)
-    + '&uid=' + encodeURIComponent(CSPID || 'unknown')
+    + '&vid=' + encodeURIComponent(CSPID || 'unknown')
     + '&t=' + (+new Date()));
 
   /* Deep link: #q-<id> opens that one answer — a tele-caller can send a

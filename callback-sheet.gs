@@ -15,11 +15,12 @@
  * Access must be "Anyone". The last line of this file is the closing brace of doGet.
  */
 function doGet(e) {
-  var p   = (e && e.parameter) || {};
-  var csp = String(p.uid || p.csp || p.csp_id || '').trim().substring(0, 80);
-  if (!csp) return ContentService.createTextOutput('no-csp');
-
+  var p      = (e && e.parameter) || {};
   var isView = String(p.flow || '').trim().toUpperCase() === 'P750VIEW';
+  /* visits arrive as vid= so that an older deployment of this script (which only
+     knows uid=) ignores them instead of dumping page views into Callbacks */
+  var csp    = String((isView ? p.vid : p.uid) || p.uid || p.csp || p.csp_id || '').trim().substring(0, 80);
+  if (!csp) return ContentService.createTextOutput('no-csp');
   var name   = isView ? 'Visits' : 'Callbacks';
   var header = isView
     ? ['date', 'time (IST)', 'csp_id', 'page', 'lang', 'opens']

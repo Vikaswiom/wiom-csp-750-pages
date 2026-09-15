@@ -205,6 +205,11 @@
     text-align:center; text-decoration:none; cursor:pointer;
   }
   .ans-cta:active{ opacity:.9; }
+  .calldone{
+    margin:14px 0 0; padding:10px 12px; border-radius:10px;
+    background:var(--positive-bg, #E4F5EC); color:#1B7F4B;
+    font-size:14px; font-weight:700; line-height:20px;
+  }
   .ans-cta:focus-visible{ outline:3px solid var(--brand-300); outline-offset:2px; }
 
   /* ── Talk to us ──────────────────────────────────────── */
@@ -336,6 +341,8 @@ var S = {
 
     helpH    : 'आपका सवाल यहाँ नहीं मिला?',
     helpP    : 'टीम आपको कॉल करके पूरा समझा देगी।<br>कॉल पाने के लिए नीचे दिये बटन पर क्लिक करें &gt;',
+    callDone : 'रिक्वेस्ट मिल गई — टीम जल्द ही आपको कॉल करेगी।',
+    callDone : 'Request received — the team will call you shortly.',
     helpCta  : 'मुझे कॉल करके समझाएं',
     offerCta : 'पेआउट का तरीका चुनें',
     offerCtaNoId : 'व्योम ऐप में जाकर चुनें',
@@ -782,8 +789,8 @@ categories: [
   { id:'who-do-i-talk-to', status:'live', src:['F11'],
     q:{hi:'फ़ोन पर समझना है — किससे बात करूँ?', en:'I want it explained on a call — whom do I talk to?'},
     a:[
-      {hi:'टीम 24 घंटे के अंदर कॉल करके पूरा समझा देगी।',
-       en:'The team calls within 24 hours and explains it fully.'},
+      {hi:'टीम 24 घंटे के अंदर कॉल करके पूरा समझा देगी। कॉल पाने के लिए नीचे दिये बटन पर क्लिक करें &gt;',
+       en:'The team calls within 24 hours and explains it fully. Tap the button below to get a call &gt;'},
       {type:'cta', hi:'मुझे कॉल करके समझायें', en:'Call me and explain'}
     ]},
 
@@ -1022,8 +1029,7 @@ categories: [
           ctaLink.href = '#';
           ctaLink.addEventListener('click', function(e){
             e.preventDefault();
-            track('CtaClicked', { target: CSPID ? 'call' : 'call_no_cspid' });
-            if (CSPID) location.href = OFFER + (OFFER.indexOf('?') > -1 ? '&' : '?') + 'want=call';
+            requestCall('answer_cta', ctaLink);
           });
           wrap.appendChild(ctaLink);
         } else {
@@ -1170,18 +1176,36 @@ categories: [
   });
   callBtn.addEventListener('click', function(e){
     e.preventDefault();
-    /* same callback log the flow pages write, so the team gets one list */
-    (function(){
+    requestCall('help_card', callBtn);
+  });
+
+  /* ── Call request ──
+     Tapping any "मुझे कॉल करके समझायें" used to bounce the CSP back to the offer
+     page, which read as the tap having failed. It now logs the request to the
+     team's sheet and confirms in place, so he knows a call is coming. */
+  var callRequested = false;
+  function requestCall(source, node){
+    var id = CSPID || 'unknown';
+    if (!callRequested) {
+      callRequested = true;
       try {
-        var id = CSPID || 'unknown';
         new Image().src = 'https://script.google.com/macros/s/AKfycbw770KNFn3SnpKbRwtLbPe8MJu8dpDXwau6UY-JTfcbA8Y0T2ZRyoGRRMhi4k8WTAo2/exec'
           + '?flow=P750CALL&screen=' + encodeURIComponent('faq_' + lang)
           + '&uid=' + encodeURIComponent(id) + '&t=' + (+new Date());
       } catch (err) {}
-    })();
-    track('CtaClicked', { target: CSPID ? 'call' : 'call_no_cspid' });
-    if (CSPID) location.href = OFFER + (OFFER.indexOf('?') > -1 ? '&' : '?') + 'want=call';
-  });
+    }
+    track('CtaClicked', { target: CSPID ? 'call' : 'call_no_cspid', source: source });
+    if (node && node.parentNode) {
+      var done = el('p', 'calldone', '\u2713 ' + S[lang].callDone);
+      node.parentNode.replaceChild(done, node);
+    }
+    /* every other call CTA on the page switches to the same confirmation */
+    var rest = document.querySelectorAll('.ans-cta, #callCta');
+    for (var i = 0; i < rest.length; i++) {
+      var d = el('p', 'calldone', '\u2713 ' + S[lang].callDone);
+      if (rest[i].parentNode) rest[i].parentNode.replaceChild(d, rest[i]);
+    }
+  }
 
   /* ── Boot ── */
   render();

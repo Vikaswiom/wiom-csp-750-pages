@@ -506,8 +506,8 @@ categories: [
 
   { id:'isp-550-leaves-200', status:'live', src:['F1','F2','F3','F5'],
     q:{hi:'ISP का रिचार्ज महँगा है — मेरा फ़ायदा क्या?', en:'My ISP recharge is costly — what is in it for me?'},
-    said:{hi:'3 महीने का ISP रिचार्ज ही ₹550 का पड़ता है, और 3 महीने सर्विस भी मेरी — इसमें मेरा क्या फ़ायदा?',
-          en:'The 3-month ISP recharge alone costs me ₹550, and service for 3 months is mine too — where is my gain?'},
+    said:{hi:'3 महीने का ISP रिचार्ज भी करूँ और 3 महीने सर्विस भी मेरी — इसमें मेरा क्या फ़ायदा?',
+          en:'I have to do the 3-month ISP recharge too, and service for 3 months is mine as well — where is my gain?'},
     a:[
       {hi:'₹750 पहले 3 महीने का पूरा पेआउट आपको शुरू में ही मिल जाता है, अब अगर कस्टमर बीच में छोड़ के चला जाता है तो उसका नुकशान आपको नहीं होता बल्कि व्योम उठाता है।',
        en:'₹750 is the full payout for the first 3 months and you get it upfront. If the customer leaves in between, the loss is not yours — Wiom bears it.'},
@@ -1055,6 +1055,17 @@ categories: [
   function toggle(item, cat, q, rank, forceOpen){
     var isOpen = item.classList.contains('open');
     if (isOpen && forceOpen) return;
+    /* One answer open at a time: opening a question closes whichever was open.
+       Without this the page grew into a wall of text as the CSP explored. */
+    if (!isOpen) {
+      var others = document.querySelectorAll('.qitem.open');
+      for (var i = 0; i < others.length; i++) {
+        if (others[i] === item) continue;
+        others[i].classList.remove('open');
+        var ob = others[i].querySelector('.qbtn');
+        if (ob) ob.setAttribute('aria-expanded', 'false');
+      }
+    }
     item.classList.toggle('open', forceOpen ? true : !isOpen);
     var btn = item.querySelector('.qbtn');
     btn.setAttribute('aria-expanded', item.classList.contains('open') ? 'true' : 'false');
@@ -1119,12 +1130,21 @@ categories: [
 
   /* ── Language toggle ── */
   document.getElementById('langToggle').addEventListener('click', function(){
-    var openIds = openOrder.slice();
+    /* Re-open only what is open RIGHT NOW (openOrder is the full history, and
+       replaying it would reopen every question the CSP ever expanded). */
+    var openIds = [];
+    var cur = document.querySelectorAll('.qitem.open');
+    for (var i = 0; i < cur.length; i++) {
+      if (cur[i].id.indexOf('q-') === 0) openIds.push(cur[i].id.slice(2));
+    }
     lang = (lang === 'hi' ? 'en' : 'hi');
     render();
     openIds.forEach(function(id){
       var item = document.getElementById('q-' + id);
-      if (item) item.classList.add('open');
+      if (!item) return;
+      item.classList.add('open');
+      var b = item.querySelector('.qbtn');
+      if (b) b.setAttribute('aria-expanded', 'true');
     });
   });
 

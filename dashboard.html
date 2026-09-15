@@ -209,9 +209,12 @@
         if (n > 12 && i !== n - 1) return;
         svg.appendChild(el('circle', {cx:X(i), cy:Y(r[k]), r:4, fill:S[si], 'class':'pt'}));
       });
-      var last = rows[n-1];
-      var lb = el('text', {x:X(n-1) - 8, y:Y(last[k]) - 9, 'text-anchor':'end', 'class':'lbl', fill:S[si]});
-      lb.textContent = last[k]; svg.appendChild(lb);
+      /* direct labels only where there is room; on a phone they sit on the line */
+      if (f.W > 560){
+        var last = rows[n-1];
+        var lb = el('text', {x:X(n-1) - 10, y:Y(last[k]) - 10, 'text-anchor':'end', 'class':'lbl', fill:S[si]});
+        lb.textContent = last[k]; svg.appendChild(lb);
+      }
     });
 
     hover(svg, rows, X, f, xKey);

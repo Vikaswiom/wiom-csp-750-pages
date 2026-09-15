@@ -31,27 +31,31 @@ function doGet(e) {
   if (p.action === 'ping') return json_({ ok: true, sheet: SHEET_NAME }, p.callback);
 
   var csp  = String(p.uid || p.csp || p.csp_id || '').trim().substring(0, 80);
-  var src  = String(p.screen || p.page || '').trim().substring(0, 40);   /* e.g. flow1_hi */
+  var scr  = String(p.screen || p.page || '').trim().substring(0, 40);   /* e.g. flow1_hi */
+  var page_ = scr.split('_')[0] || '';
+  var lang_ = scr.split('_')[1] || '';
   var flow = String(p.flow || '').trim().substring(0, 20);
+  var src  = String(p.src || '').trim().substring(0, 60);   /* which CTA / question */
 
-  if (csp) logCallback_(csp, src, flow);
+  if (csp) logCallback_(csp, page_, lang_, flow, src);
   return gif_();          /* the page calls this via new Image(), so answer with a pixel */
 }
 
-function logCallback_(csp, src, flow) {
+function logCallback_(csp, page, lang, flow, src) {
   var lock = LockService.getScriptLock();
   try { lock.waitLock(5000); } catch (err) { /* proceed anyway */ }
   try {
     var sh   = sheet_();
     var now  = new Date();
-    var bits = src.split('_');
-    var page = bits[0] || '';
-    var lang = bits[1] || '';
-
     var row = findRecent_(sh, csp);
     if (row) {
       sh.getRange(row, 8).setValue(Number(sh.getRange(row, 8).getValue() || 1) + 1);
       sh.getRange(row, 9).setValue(fmt_(now, 'yyyy-MM-dd HH:mm'));
+      /* keep every place he asked from, so the caller has the context */
+      var seen = String(sh.getRange(row, 11).getValue() || '');
+      if (src && seen.indexOf(src) < 0) {
+        sh.getRange(row, 11).setValue(seen ? seen + ', ' + src : src);
+      }
       return;
     }
     sh.appendRow([
@@ -64,7 +68,8 @@ function logCallback_(csp, src, flow) {
       'Pending',                      /* G status      */
       1,                              /* H requests    */
       fmt_(now, 'yyyy-MM-dd HH:mm'),  /* I last request*/
-      ''                              /* J notes       */
+      '',                             /* J notes       */
+      src                             /* K asked from  */
     ]);
     var last = sh.getLastRow();
     sh.getRange(last, 7).setDataValidation(statusRule_());
@@ -95,9 +100,9 @@ function sheet_() {
   var sh = ss.getSheetByName(SHEET_NAME);
   if (!sh) {
     sh = ss.insertSheet(SHEET_NAME);
-    sh.appendRow(['date','time (IST)','csp_id','page','lang','flow','status','requests','last request','notes']);
+    sh.appendRow(['date','time (IST)','csp_id','page','lang','flow','status','requests','last request','notes','asked from']);
     sh.setFrozenRows(1);
-    sh.getRange(1, 1, 1, 10).setFontWeight('bold');
+    sh.getRange(1, 1, 1, 11).setFontWeight('bold');
     sh.setColumnWidth(3, 120);
     sh.setColumnWidth(10, 280);
   }

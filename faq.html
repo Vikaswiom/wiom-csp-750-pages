@@ -1027,10 +1027,12 @@ categories: [
         } else if (typeof block === 'object' && block.type === 'cta') {
           var ctaLink = el('a', 'ans-cta', t(block));
           ctaLink.href = '#';
-          ctaLink.addEventListener('click', function(e){
-            e.preventDefault();
-            requestCall('answer_cta', ctaLink);
-          });
+          (function(qid){
+            ctaLink.addEventListener('click', function(e){
+              e.preventDefault();
+              requestCall(qid, ctaLink);
+            });
+          })(q.id);
           wrap.appendChild(ctaLink);
         } else {
           wrap.appendChild(el('p', '', t(block)));
@@ -1183,27 +1185,24 @@ categories: [
      Tapping any "मुझे कॉल करके समझायें" used to bounce the CSP back to the offer
      page, which read as the tap having failed. It now logs the request to the
      team's sheet and confirms in place, so he knows a call is coming. */
-  var callRequested = false;
   function requestCall(source, node){
     var id = CSPID || 'unknown';
-    if (!callRequested) {
-      callRequested = true;
-      try {
-        new Image().src = 'https://script.google.com/macros/s/AKfycbw770KNFn3SnpKbRwtLbPe8MJu8dpDXwau6UY-JTfcbA8Y0T2ZRyoGRRMhi4k8WTAo2/exec'
-          + '?flow=P750CALL&screen=' + encodeURIComponent('faq_' + lang)
-          + '&uid=' + encodeURIComponent(id) + '&t=' + (+new Date());
-      } catch (err) {}
-    }
+    /* EVERY call CTA writes its own row, tagged with where it was tapped —
+       that is how we learn which question actually drives call requests.
+       The sheet dedups per CSP, so repeat taps bump a counter, not the list. */
+    try {
+      new Image().src = 'https://script.google.com/macros/s/AKfycbw770KNFn3SnpKbRwtLbPe8MJu8dpDXwau6UY-JTfcbA8Y0T2ZRyoGRRMhi4k8WTAo2/exec'
+        + '?flow=P750CALL&screen=' + encodeURIComponent('faq_' + lang)
+        + '&uid=' + encodeURIComponent(id)
+        + '&src=' + encodeURIComponent(String(source).substring(0, 40))
+        + '&t=' + (+new Date());
+    } catch (err) {}
     track('CtaClicked', { target: CSPID ? 'call' : 'call_no_cspid', source: source });
+    /* only the CTA he tapped becomes the confirmation; the rest stay live so a
+       later question can log its own request */
     if (node && node.parentNode) {
       var done = el('p', 'calldone', '\u2713 ' + S[lang].callDone);
       node.parentNode.replaceChild(done, node);
-    }
-    /* every other call CTA on the page switches to the same confirmation */
-    var rest = document.querySelectorAll('.ans-cta, #callCta');
-    for (var i = 0; i < rest.length; i++) {
-      var d = el('p', 'calldone', '\u2713 ' + S[lang].callDone);
-      if (rest[i].parentNode) rest[i].parentNode.replaceChild(d, rest[i]);
     }
   }
 

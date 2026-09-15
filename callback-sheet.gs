@@ -16,6 +16,83 @@
  */
 function doGet(e) {
   var p      = (e && e.parameter) || {};
+
+  /* ── Dashboard feed: aggregates only, never a csp_id ──────────────────
+     ?action=stats            -> JSON
+     ?action=stats&callback=f -> JSONP (the dashboard uses this; Apps Script
+                                 redirects break a plain cross-origin fetch) */
+  if (String(p.action || '') === 'stats') {
+    var ssx   = SpreadsheetApp.getActiveSpreadsheet();
+    var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd');
+    var dstr  = function (v) {
+      return (v instanceof Date) ? Utilities.formatDate(v, 'Asia/Kolkata', 'yyyy-MM-dd') : String(v);
+    };
+    var hstr  = function (v) {
+      if (v instanceof Date) return Utilities.formatDate(v, 'Asia/Kolkata', 'HH');
+      var s = String(v); return s.length >= 2 ? s.substring(0, 2) : '';
+    };
+    var days = {}, hours = {}, uniq = { flow: {}, faq: {}, call: {} };
+    var day  = function (d) {
+      if (!days[d]) days[d] = { d: d, flow: {}, faq: {}, calls: {} };
+      return days[d];
+    };
+    var hour = function (h) {
+      if (!hours[h]) hours[h] = { h: h, flow: {}, faq: {}, calls: {} };
+      return hours[h];
+    };
+
+    var vsh = ssx.getSheetByName('Visits');
+    if (vsh && vsh.getLastRow() > 1) {
+      var vv = vsh.getRange(2, 1, vsh.getLastRow() - 1, 4).getValues();
+      for (var a = 0; a < vv.length; a++) {
+        var vd = dstr(vv[a][0]), vc = String(vv[a][2]), vp = String(vv[a][3]);
+        if (!vc) continue;
+        var key = (vp === 'faq') ? 'faq' : 'flow';
+        uniq[key][vc] = 1;
+        day(vd)[key === 'faq' ? 'faq' : 'flow'][vc] = 1;
+        if (vd === today) hour(hstr(vv[a][1]))[key === 'faq' ? 'faq' : 'flow'][vc] = 1;
+      }
+    }
+    var csh = ssx.getSheetByName('Callbacks');
+    var pending = 0;
+    if (csh && csh.getLastRow() > 1) {
+      var cv = csh.getRange(2, 1, csh.getLastRow() - 1, 6).getValues();
+      for (var b = 0; b < cv.length; b++) {
+        var cd = dstr(cv[b][0]), cc = String(cv[b][2]);
+        if (!cc) continue;
+        uniq.call[cc] = 1;
+        day(cd).calls[cc] = 1;
+        if (cd === today) hour(hstr(cv[b][1])).calls[cc] = 1;
+        if (String(cv[b][5]) === 'Pending') pending++;
+      }
+    }
+
+    var n = function (o) { var c = 0, k; for (k in o) if (o.hasOwnProperty(k)) c++; return c; };
+    var dayList = [], hourList = [], kk;
+    for (kk in days) if (days.hasOwnProperty(kk)) {
+      dayList.push({ d: days[kk].d, flow: n(days[kk].flow), faq: n(days[kk].faq), calls: n(days[kk].calls) });
+    }
+    dayList.sort(function (x, y) { return x.d < y.d ? -1 : 1; });
+    for (kk in hours) if (hours.hasOwnProperty(kk)) {
+      hourList.push({ h: hours[kk].h, flow: n(hours[kk].flow), faq: n(hours[kk].faq), calls: n(hours[kk].calls) });
+    }
+    hourList.sort(function (x, y) { return x.h < y.h ? -1 : 1; });
+
+    var stats = {
+      updated: new Date().toISOString(),
+      today: today,
+      totals: { flow: n(uniq.flow), faq: n(uniq.faq), calls: n(uniq.call), pending: pending },
+      days: dayList,
+      hours: hourList
+    };
+    var body = JSON.stringify(stats);
+    if (p.callback) {
+      return ContentService.createTextOutput(p.callback + '(' + body + ')')
+        .setMimeType(ContentService.MimeType.JAVASCRIPT);
+    }
+    return ContentService.createTextOutput(body).setMimeType(ContentService.MimeType.JSON);
+  }
+
   var isView = String(p.flow || '').trim().toUpperCase() === 'P750VIEW';
   /* visits arrive as vid= so that an older deployment of this script (which only
      knows uid=) ignores them instead of dumping page views into Callbacks */

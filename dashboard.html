@@ -1,0 +1,271 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>₹750 opt-in — reach & call requests</title>
+<style>
+  :root{
+    --s1:#D9008D; --s2:#1F6FEB; --s3:#C77700;
+    --bg:#fcfcfb; --card:#ffffff; --line:#E8E4F0; --grid:#F1EDF7;
+    --ink:#161021; --ink2:#4A4356; --ink3:#7C7589;
+    --good:#1B7F4B; --warn:#946200;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#141118; --card:#1C1822; --line:#2E2838; --grid:#262030;
+           --ink:#F4F2F8; --ink2:#C6C0D2; --ink3:#8E8799; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+       font-size:14px;line-height:1.5;padding:20px 16px 48px}
+  .wrap{max-width:1000px;margin:0 auto}
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+  h1{font-size:19px;margin:0;font-weight:700}
+  .sub{color:var(--ink3);font-size:13px;margin:0 0 18px}
+  .stamp{margin-left:auto;font-size:12px;color:var(--ink3)}
+  button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink2);
+         border-radius:8px;padding:5px 12px;cursor:pointer;font-size:12px;font-weight:600}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .tile .lab{font-size:12px;color:var(--ink3);display:flex;align-items:center;gap:6px;font-weight:600}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .tile .num{font-size:30px;font-weight:800;letter-spacing:-.5px;margin-top:6px;
+             font-variant-numeric:tabular-nums;line-height:1.1}
+  .tile .note{font-size:12px;color:var(--ink3);margin-top:2px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+  .card h2{font-size:14px;margin:0 0 2px;font-weight:700}
+  .card .cap{font-size:12px;color:var(--ink3);margin:0 0 12px}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin-bottom:8px}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .chart{width:100%;height:230px;display:block;overflow:visible}
+  .chart text{font-size:11px;fill:var(--ink3)}
+  .chart .gl{stroke:var(--grid);stroke-width:1}
+  .chart .ax{stroke:var(--line);stroke-width:1}
+  .chart .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .chart .pt{stroke:var(--card);stroke-width:2}
+  .chart .lbl{font-weight:700;font-size:11px}
+  .tipline{stroke:var(--ink3);stroke-width:1;stroke-dasharray:3 3}
+  .tip{position:fixed;pointer-events:none;background:var(--card);border:1px solid var(--line);
+       border-radius:10px;padding:8px 10px;font-size:12px;box-shadow:0 6px 20px rgba(0,0,0,.14);
+       display:none;z-index:9;min-width:132px}
+  .tip b{display:block;margin-bottom:4px;color:var(--ink)}
+  .tip .r{display:flex;align-items:center;gap:6px;color:var(--ink2);justify-content:space-between}
+  .tip .r i{font-style:normal;display:flex;align-items:center;gap:6px}
+  .tip .r b{display:inline;font-variant-numeric:tabular-nums}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px}
+  th,td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+  th:first-child,td:first-child{text-align:left}
+  th{color:var(--ink3);font-weight:600;font-size:12px}
+  details{margin-top:10px}summary{cursor:pointer;color:var(--ink3);font-size:12px}
+  .err{background:#FFE9E5;border:1px solid #FFBDB3;color:#B3261E;border-radius:10px;padding:12px;font-size:13px}
+  @media (prefers-color-scheme: dark){ .err{background:#3A1B18;border-color:#7A2E26;color:#FFB4A8} }
+  .empty{color:var(--ink3);font-size:13px;padding:24px 0;text-align:center}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>₹750 opt-in — reach &amp; call requests</h1>
+    <span class="stamp" id="stamp">loading…</span>
+  </header>
+  <p class="sub">Unique CSPs, from the Callbacks sheet. Refreshes automatically every hour.</p>
+
+  <div id="err" class="err" style="display:none"></div>
+
+  <div class="tiles">
+    <div class="tile"><div class="lab"><i class="dot" style="background:var(--s1)"></i>Opened the offer</div>
+      <div class="num" id="t-flow">—</div><div class="note">unique CSPs</div></div>
+    <div class="tile"><div class="lab"><i class="dot" style="background:var(--s2)"></i>Read the FAQ</div>
+      <div class="num" id="t-faq">—</div><div class="note" id="t-faq-note">unique CSPs</div></div>
+    <div class="tile"><div class="lab"><i class="dot" style="background:var(--s3)"></i>Asked for a call</div>
+      <div class="num" id="t-call">—</div><div class="note" id="t-call-note">unique CSPs</div></div>
+    <div class="tile"><div class="lab">Pending callbacks</div>
+      <div class="num" id="t-pend">—</div><div class="note">still marked Pending</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Unique CSPs per day</h2>
+    <p class="cap">One count per CSP per day — reopening the page does not add to it.</p>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--s1)"></i>Opened the offer</span>
+      <span><i class="dot" style="background:var(--s2)"></i>Read the FAQ</span>
+      <span><i class="dot" style="background:var(--s3)"></i>Asked for a call</span>
+    </div>
+    <svg class="chart" id="daily" preserveAspectRatio="none"></svg>
+    <details><summary>Show as a table</summary>
+      <table id="daily-t"><thead><tr><th>Date</th><th>Offer</th><th>FAQ</th><th>Calls</th></tr></thead><tbody></tbody></table>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Today, by hour <span id="today-date" style="color:var(--ink3);font-weight:400"></span></h2>
+    <p class="cap">Hour of each CSP's most recent activity, IST.</p>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--s1)"></i>Opened the offer</span>
+      <span><i class="dot" style="background:var(--s2)"></i>Read the FAQ</span>
+      <span><i class="dot" style="background:var(--s3)"></i>Asked for a call</span>
+    </div>
+    <svg class="chart" id="hourly" preserveAspectRatio="none"></svg>
+  </div>
+
+  <button id="refresh">Refresh now</button>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+(function(){
+  var EXEC = 'https://script.google.com/macros/s/AKfycbzoETDCLj11-R8D17i7D17y6z5w2gVVeYCRLogaoWCnfQc-SJ-dlbM2piIhfB68ecS9/exec';
+  var S = ['var(--s1)', 'var(--s2)', 'var(--s3)'];
+  var NAMES = ['Opened the offer', 'Read the FAQ', 'Asked for a call'];
+  var KEYS = ['flow', 'faq', 'calls'];
+  var tip = document.getElementById('tip');
+  var NS = 'http://www.w3.org/2000/svg';
+
+  function el(n, a){ var x = document.createElementNS(NS, n); for (var k in a) x.setAttribute(k, a[k]); return x; }
+  function pct(a, b){ return b ? Math.round(a / b * 100) + '%' : '—'; }
+
+  function load(){
+    document.getElementById('stamp').textContent = 'refreshing…';
+    var cb = 'p750cb' + Date.now();
+    var s = document.createElement('script');
+    var done = false;
+    window[cb] = function(data){ done = true; try{ paint(data); }catch(e){ fail(e.message); } cleanup(); };
+    function cleanup(){ try{ delete window[cb]; }catch(e){} if (s.parentNode) s.parentNode.removeChild(s); }
+    s.onerror = function(){ fail('Could not reach the sheet endpoint.'); cleanup(); };
+    setTimeout(function(){ if (!done){ fail('The sheet endpoint did not answer.'); cleanup(); } }, 20000);
+    s.src = EXEC + '?action=stats&callback=' + cb + '&t=' + Date.now();
+    document.body.appendChild(s);
+  }
+  function fail(m){
+    var e = document.getElementById('err');
+    e.style.display = 'block';
+    e.textContent = m + ' If this persists, open the /exec URL with ?action=stats to check the Apps Script.';
+    document.getElementById('stamp').textContent = 'failed';
+  }
+
+  function paint(d){
+    document.getElementById('err').style.display = 'none';
+    var t = d.totals || {};
+    document.getElementById('t-flow').textContent = t.flow || 0;
+    document.getElementById('t-faq').textContent  = t.faq || 0;
+    document.getElementById('t-call').textContent = t.calls || 0;
+    document.getElementById('t-pend').textContent = t.pending || 0;
+    document.getElementById('t-faq-note').textContent  = pct(t.faq, t.flow) + ' of those who opened';
+    document.getElementById('t-call-note').textContent = pct(t.calls, t.flow) + ' of those who opened';
+    document.getElementById('today-date').textContent = d.today ? '· ' + d.today : '';
+    var when = new Date(d.updated);
+    document.getElementById('stamp').textContent = 'updated ' + when.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+    lines(document.getElementById('daily'), d.days || [], 'd');
+    bars(document.getElementById('hourly'), d.hours || []);
+
+    var tb = document.querySelector('#daily-t tbody');
+    tb.innerHTML = '';
+    (d.days || []).slice().reverse().forEach(function(r){
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + r.d + '</td><td>' + r.flow + '</td><td>' + r.faq + '</td><td>' + r.calls + '</td>';
+      tb.appendChild(tr);
+    });
+  }
+
+  function frame(svg, rows, maxV){
+    svg.innerHTML = '';
+    var W = svg.clientWidth || 900, H = 230, L = 34, R = 12, T = 12, B = 26;
+    if (!rows.length){
+      var p = document.createElementNS(NS, 'text');
+      p.setAttribute('x', W/2); p.setAttribute('y', H/2); p.setAttribute('text-anchor','middle');
+      p.textContent = 'No data yet'; svg.appendChild(p);
+      return null;
+    }
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    var max = Math.max(1, maxV), step = Math.max(1, Math.ceil(max / 4));
+    max = step * 4;
+    for (var g = 0; g <= 4; g++){
+      var y = T + (H - T - B) * (1 - g / 4);
+      svg.appendChild(el('line', {x1:L, y1:y, x2:W-R, y2:y, 'class':'gl'}));
+      var tx = el('text', {x:L-7, y:y+4, 'text-anchor':'end'});
+      tx.textContent = step * g; svg.appendChild(tx);
+    }
+    return { W:W, H:H, L:L, R:R, T:T, B:B, max:max };
+  }
+
+  function lines(svg, rows, xKey){
+    var maxV = 0;
+    rows.forEach(function(r){ KEYS.forEach(function(k){ if (r[k] > maxV) maxV = r[k]; }); });
+    var f = frame(svg, rows, maxV); if (!f) return;
+    var n = rows.length;
+    var X = function(i){ return n === 1 ? (f.L + f.W - f.R) / 2 : f.L + (f.W - f.L - f.R) * (i / (n - 1)); };
+    var Y = function(v){ return f.T + (f.H - f.T - f.B) * (1 - v / f.max); };
+
+    rows.forEach(function(r, i){
+      if (n > 8 && i % Math.ceil(n / 8) !== 0 && i !== n - 1) return;
+      var tx = el('text', {x:X(i), y:f.H - 6, 'text-anchor':'middle'});
+      tx.textContent = String(r[xKey]).slice(5);
+      svg.appendChild(tx);
+    });
+
+    KEYS.forEach(function(k, si){
+      var dPath = rows.map(function(r, i){ return (i ? 'L' : 'M') + X(i) + ' ' + Y(r[k]); }).join(' ');
+      svg.appendChild(el('path', {d:dPath, 'class':'ln', stroke:S[si]}));
+      rows.forEach(function(r, i){
+        if (n > 12 && i !== n - 1) return;
+        svg.appendChild(el('circle', {cx:X(i), cy:Y(r[k]), r:4, fill:S[si], 'class':'pt'}));
+      });
+      var last = rows[n-1];
+      var lb = el('text', {x:X(n-1) - 8, y:Y(last[k]) - 9, 'text-anchor':'end', 'class':'lbl', fill:S[si]});
+      lb.textContent = last[k]; svg.appendChild(lb);
+    });
+
+    hover(svg, rows, X, f, xKey);
+  }
+
+  function bars(svg, rows){
+    var maxV = 0;
+    rows.forEach(function(r){ KEYS.forEach(function(k){ if (r[k] > maxV) maxV = r[k]; }); });
+    var f = frame(svg, rows, maxV); if (!f) return;
+    var n = rows.length;
+    var slot = (f.W - f.L - f.R) / n, bw = Math.max(3, Math.min(14, slot / 4));
+    var Y = function(v){ return f.T + (f.H - f.T - f.B) * (1 - v / f.max); };
+    rows.forEach(function(r, i){
+      var x0 = f.L + slot * i + (slot - bw * 3 - 4) / 2;
+      KEYS.forEach(function(k, si){
+        var h = (f.H - f.T - f.B) * (r[k] / f.max);
+        if (h <= 0) return;
+        svg.appendChild(el('rect', {x:x0 + si * (bw + 2), y:Y(r[k]), width:bw, height:h, rx:3, fill:S[si]}));
+      });
+      var tx = el('text', {x:f.L + slot * i + slot / 2, y:f.H - 6, 'text-anchor':'middle'});
+      tx.textContent = r.h + 'h'; svg.appendChild(tx);
+    });
+    hover(svg, rows, function(i){ return f.L + slot * i + slot / 2; }, f, 'h');
+  }
+
+  function hover(svg, rows, X, f, xKey){
+    var line = el('line', {y1:f.T, y2:f.H - f.B, 'class':'tipline', opacity:0});
+    svg.appendChild(line);
+    function at(ev){
+      var box = svg.getBoundingClientRect();
+      var rel = (ev.clientX - box.left) / box.width * f.W;
+      var best = 0, bd = 1e9;
+      rows.forEach(function(r, i){ var d = Math.abs(X(i) - rel); if (d < bd){ bd = d; best = i; } });
+      var r = rows[best];
+      line.setAttribute('x1', X(best)); line.setAttribute('x2', X(best)); line.setAttribute('opacity', 1);
+      var html = '<b>' + (xKey === 'h' ? r.h + ':00 IST' : r.d) + '</b>';
+      KEYS.forEach(function(k, si){
+        html += '<div class="r"><i><span class="dot" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + S[si] + '"></span>' + NAMES[si] + '</i><b>' + r[k] + '</b></div>';
+      });
+      tip.innerHTML = html;
+      tip.style.display = 'block';
+      var tw = tip.offsetWidth;
+      tip.style.left = Math.min(window.innerWidth - tw - 10, Math.max(8, ev.clientX + 14)) + 'px';
+      tip.style.top  = Math.max(8, ev.clientY - 20) + 'px';
+    }
+    svg.addEventListener('mousemove', at);
+    svg.addEventListener('touchstart', function(e){ at(e.touches[0]); });
+    svg.addEventListener('touchmove',  function(e){ at(e.touches[0]); });
+    svg.addEventListener('mouseleave', function(){ tip.style.display = 'none'; line.setAttribute('opacity', 0); });
+  }
+
+  document.getElementById('refresh').addEventListener('click', load);
+  window.addEventListener('resize', function(){ clearTimeout(window.__rz); window.__rz = setTimeout(load, 300); });
+  load();
+  setInterval(load, 60 * 60 * 1000);   /* hourly */
+})();
+</script>

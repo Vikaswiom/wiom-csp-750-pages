@@ -1114,13 +1114,11 @@ render();
     var id = '';
     try { id = cspId() || 'unknown'; } catch (e) { id = 'unknown'; }
     var lg = (typeof lang !== 'undefined') ? lang : 'hi';
-    try {
-      new Image().src = P750_CALL_LOG
-        + '?flow=P750CALL'
-        + '&screen=' + encodeURIComponent(P750_PAGE + '_' + lg)
-        + '&uid=' + encodeURIComponent(id)
-        + '&t=' + (+new Date());
-    } catch (e) {}
+    sheetBeacon(P750_CALL_LOG
+      + '?flow=P750CALL'
+      + '&screen=' + encodeURIComponent(P750_PAGE + '_' + lg)
+      + '&uid=' + encodeURIComponent(id)
+      + '&t=' + (+new Date()));
     try { track('Progress', { milestone: 'callback_requested' }); } catch (e) {}
   }
 
@@ -1141,4 +1139,27 @@ render();
       document.documentElement.className += ' nosticky';
     }
   })();
+
+  /* ── Sheet beacon ──
+     Apps Script answers with a 302 to script.googleusercontent.com and a text body.
+     Some in-app WebViews drop that redirect for an <img>, so fire two independent
+     channels: a no-cors fetch (follows redirects, no response needed) and an Image.
+     Either one reaching the server writes the row; both failing is a dead network. */
+  function sheetBeacon(url){
+    var sent = false;
+    try {
+      if (typeof fetch === 'function') {
+        fetch(url, { mode: 'no-cors', cache: 'no-store', keepalive: true });
+        sent = true;
+      }
+    } catch (e) {}
+    try { new Image().src = url; sent = true; } catch (e) {}
+    if (!sent) {
+      try {
+        var x = new XMLHttpRequest();
+        x.open('GET', url, true);
+        x.send();
+      } catch (e) {}
+    }
+  }
 </script>

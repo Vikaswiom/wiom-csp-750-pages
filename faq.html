@@ -1190,12 +1190,10 @@ categories: [
     /* EVERY call CTA writes its own row, tagged with where it was tapped —
        that is how we learn which question actually drives call requests.
        The sheet dedups per CSP, so repeat taps bump a counter, not the list. */
-    try {
-      new Image().src = 'https://script.google.com/macros/s/AKfycbzpJ5R_TtfAeyjb04775eoFFwTvHza0nCoX_Oa5knETWmzZQs0-JpGQJPjIIO1dnrEn/exec'
-        + '?flow=P750CALL&screen=' + encodeURIComponent('faq_' + lang)
-        + '&uid=' + encodeURIComponent(id)
-        + '&t=' + (+new Date());
-    } catch (err) {}
+    sheetBeacon('https://script.google.com/macros/s/AKfycbzpJ5R_TtfAeyjb04775eoFFwTvHza0nCoX_Oa5knETWmzZQs0-JpGQJPjIIO1dnrEn/exec'
+      + '?flow=P750CALL&screen=' + encodeURIComponent('faq_' + lang)
+      + '&uid=' + encodeURIComponent(id)
+      + '&t=' + (+new Date()));
     track('CtaClicked', { target: CSPID ? 'call' : 'call_no_cspid', source: source });
     /* only the CTA he tapped becomes the confirmation; the rest stay live so a
        later question can log its own request */
@@ -1236,4 +1234,27 @@ categories: [
       if (CSPID) { location.href = OFFER; }
     });
   })();
+
+  /* ── Sheet beacon ──
+     Apps Script answers with a 302 to script.googleusercontent.com and a text body.
+     Some in-app WebViews drop that redirect for an <img>, so fire two independent
+     channels: a no-cors fetch (follows redirects, no response needed) and an Image.
+     Either one reaching the server writes the row; both failing is a dead network. */
+  function sheetBeacon(url){
+    var sent = false;
+    try {
+      if (typeof fetch === 'function') {
+        fetch(url, { mode: 'no-cors', cache: 'no-store', keepalive: true });
+        sent = true;
+      }
+    } catch (e) {}
+    try { new Image().src = url; sent = true; } catch (e) {}
+    if (!sent) {
+      try {
+        var x = new XMLHttpRequest();
+        x.open('GET', url, true);
+        x.send();
+      } catch (e) {}
+    }
+  }
 </script>

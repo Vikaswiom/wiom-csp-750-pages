@@ -1,0 +1,70 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Callback beacon test</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Noto Sans",sans-serif;margin:0;padding:16px 14px 40px;background:#fff;color:#161021;font-size:14px;line-height:1.5}
+  h1{font-size:17px;margin:0 0 2px}
+  .sub{color:#665E75;margin:0 0 14px;font-size:13px}
+  table{border-collapse:collapse;width:100%}
+  td{border-bottom:1px solid #E8E4F0;padding:7px 4px;vertical-align:top;word-break:break-word}
+  td:first-child{color:#665E75;width:44%}
+  b.ok{color:#1B7F4B}b.bad{color:#B3261E}b.wait{color:#946200}
+  button{display:block;width:100%;margin:16px 0 0;padding:15px;border:0;border-radius:12px;background:#D9008D;color:#fff;font:inherit;font-weight:700}
+  .note{background:#FFF3CD;border:1px solid #FFECB5;border-radius:8px;padding:10px;margin-top:14px;font-size:13px}
+</style>
+<h1>Callback beacon test</h1>
+<p class="sub">Open this on the CSP's phone, tap the button, screenshot the whole page.</p>
+<table id="t"></table>
+<button id="go">Send a test row to the sheet</button>
+<div class="note" id="verdict">Tap the button above.</div>
+<script>
+(function(){
+  var EXEC = 'https://script.google.com/macros/s/AKfycbzpJ5R_TtfAeyjb04775eoFFwTvHza0nCoX_Oa5knETWmzZQs0-JpGQJPjIIO1dnrEn/exec';
+  function row(k, v){
+    var tr = document.createElement('tr');
+    var a = document.createElement('td'); a.textContent = k;
+    var b = document.createElement('td'); b.innerHTML = v; b.id = 'v-' + k.replace(/\W/g,'');
+    tr.appendChild(a); tr.appendChild(b); document.getElementById('t').appendChild(tr);
+  }
+  function set(k, v){ var n = document.getElementById('v-' + k.replace(/\W/g,'')); if (n) n.innerHTML = v; }
+  function yn(c){ return c ? '<b class="ok">YES</b>' : '<b class="bad">NO</b>'; }
+
+  var m = /[?&#/]csp[_-]?id=([^&#?/]+)/i.exec(location.href || '');
+  var id = m ? decodeURIComponent(m[1]) : '';
+  row('JavaScript runs', '<b class="ok">YES</b>');
+  row('cspId in URL', id ? id : '<b class="bad">MISSING</b>');
+  row('User agent', navigator.userAgent);
+  row('fetch available', yn(typeof fetch === 'function'));
+  row('Image available', yn(typeof Image === 'function'));
+  row('online', yn(navigator.onLine !== false));
+  row('fetch result', '<b class="wait">not tried</b>');
+  row('Image result', '<b class="wait">not tried</b>');
+
+  document.getElementById('go').addEventListener('click', function(){
+    var uid = (id || 'BEACONTEST') + '-' + Math.floor(Math.random() * 900 + 100);
+    var url = EXEC + '?flow=P750CALL&screen=beacontest_hi&uid=' + encodeURIComponent(uid) + '&t=' + (+new Date());
+    set('cspId in URL', (id || '(none)') + ' &rarr; sent as <b>' + uid + '</b>');
+    document.getElementById('verdict').innerHTML = 'Sent. Watch the two results below, then check the sheet for <b>' + uid + '</b>.';
+
+    if (typeof fetch === 'function') {
+      set('fetch result', '<b class="wait">sending…</b>');
+      fetch(url, { mode: 'no-cors', cache: 'no-store' })
+        .then(function(){ set('fetch result', '<b class="ok">request completed</b>'); })
+        .catch(function(e){ set('fetch result', '<b class="bad">FAILED</b> ' + e); });
+    } else {
+      set('fetch result', '<b class="bad">no fetch on this WebView</b>');
+    }
+
+    set('Image result', '<b class="wait">sending…</b>');
+    var img = new Image();
+    img.onload  = function(){ set('Image result', '<b class="ok">loaded</b>'); };
+    img.onerror = function(){ set('Image result', '<b class="ok">request went out</b> (error is normal — the reply is text, not an image)'); };
+    setTimeout(function(){
+      var n = document.getElementById('v-Imageresult');
+      if (n && n.innerHTML.indexOf('sending') > -1) n.innerHTML = '<b class="bad">no response in 8s — blocked</b>';
+    }, 8000);
+    img.src = url;
+  });
+})();
+</script>

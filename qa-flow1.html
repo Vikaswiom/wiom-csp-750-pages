@@ -72,7 +72,12 @@
   .langtoggle:focus-visible{ outline:2px solid var(--brand-300); outline-offset:2px; }
 
   .content{ padding:8px 20px 32px; }
-  .togglerow{ display:flex; justify-content:flex-end; align-items:center; gap:8px; padding:14px 16px 0; }
+  /* sticky: the FAQ shortcut must stay reachable however far the CSP scrolls */
+  .togglerow{
+    position:sticky; top:0; z-index:20;
+    display:flex; justify-content:flex-end; align-items:center; gap:8px;
+    padding:12px 16px 10px; background:var(--white);
+  }
   /* FAQ shortcut — sits immediately left of the language toggle */
   .faqcta{
     border:1px solid var(--brand-200); background:var(--brand-100); color:var(--brand-600);
@@ -905,6 +910,7 @@
     cp.choice = confirmed;
     cp.lang = lang; cp.lang_toggles = langToggles; cp.selection_changes = selectionChanges; cp.seconds = secs();
     track(confirmed === 'new' ? 'Confirmed' : 'Declined', cp);
+    if (confirmed !== 'new') callbackLog('choice_confirmed');
     if (confirmed === 'new') postConsent('OPTED_IN', 1);
     // done page covers the content — stop accruing block time
     pauseAll();
@@ -1032,4 +1038,30 @@
       setTimeout(function(){ location.href = url; }, 120);
     });
   })();
+
+  var P750_PAGE = 'qa_flow1';
+  /* ── Callback request log ─────────────────────────────────────
+     "मुझे कॉल करके समझाएं" has to reach the team as a LIST, not just a
+     CleverTap event. Pixel beacon -> the shared Apps Script -> Google Sheet.
+     Shape matches the existing sheet columns (flow / screen / t) so no change
+     is needed on the Apps Script side; the CSP ID rides inside `screen`.
+     Swap P750_CALL_LOG for a dedicated deployment to split it into its own sheet. */
+  var P750_CALL_LOG = 'https://script.google.com/macros/s/AKfycbw770KNFn3SnpKbRwtLbPe8MJu8dpDXwau6UY-JTfcbA8Y0T2ZRyoGRRMhi4k8WTAo2/exec';
+  var callbackLogged = false;
+  function callbackLog(where){
+    if (callbackLogged) return;
+    callbackLogged = true;
+    var id = '';
+    try { id = cspId() || 'unknown'; } catch (e) { id = 'unknown'; }
+    var lg = (typeof lang !== 'undefined') ? lang : 'hi';
+    var row = P750_PAGE + '|' + id + '|' + lg + '|' + (where || '');
+    try {
+      new Image().src = P750_CALL_LOG
+        + '?flow=P750_CALLBACK&screen=' + encodeURIComponent(row)
+        + '&csp=' + encodeURIComponent(id)
+        + '&page=' + encodeURIComponent(P750_PAGE)
+        + '&t=' + (+new Date());
+    } catch (e) {}
+    try { track('Progress', { milestone: 'callback_requested' }); } catch (e) {}
+  }
 </script>

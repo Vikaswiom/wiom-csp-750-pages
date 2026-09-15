@@ -1152,6 +1152,15 @@ categories: [
   });
   callBtn.addEventListener('click', function(e){
     e.preventDefault();
+    /* same callback log the flow pages write, so the team gets one list */
+    (function(){
+      try {
+        var id = CSPID || 'unknown';
+        new Image().src = 'https://script.google.com/macros/s/AKfycbw770KNFn3SnpKbRwtLbPe8MJu8dpDXwau6UY-JTfcbA8Y0T2ZRyoGRRMhi4k8WTAo2/exec'
+          + '?flow=P750_CALLBACK&screen=' + encodeURIComponent('faq|' + id + '|' + lang + '|help_cta')
+          + '&csp=' + encodeURIComponent(id) + '&page=faq&t=' + (+new Date());
+      } catch (err) {}
+    })();
     track('CtaClicked', { target: CSPID ? 'call' : 'call_no_cspid' });
     if (CSPID) location.href = OFFER + (OFFER.indexOf('?') > -1 ? '&' : '?') + 'want=call';
   });

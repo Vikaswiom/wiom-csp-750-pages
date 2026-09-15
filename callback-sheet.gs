@@ -27,6 +27,9 @@ function doGet(e) {
     : ['date', 'time (IST)', 'csp_id', 'page', 'lang', 'status', 'requests', 'notes'];
   var countCol = isView ? 6 : 7;
 
+  header = header.concat(['key']);          /* last column: dedup key, plain text */
+  var keyCol = header.length;
+
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sh = ss.getSheetByName(name);
   if (!sh) {
@@ -43,18 +46,17 @@ function doGet(e) {
   var page = scr[0] || '';
   var lang = scr[1] || '';
 
-  /* already logged today? bump the counter instead of adding a row */
+  /* Dedup on a key the script writes itself. Never compare the date CELL: Sheets
+     turns it into a Date in the spreadsheet's own timezone, and re-formatting that
+     in IST can land on the previous day — which is why dedup silently never matched. */
+  var key  = 'k' + date + '|' + csp + (isView ? '|' + page : '');
   var last = sh.getLastRow();
   if (last > 1) {
     var n    = Math.min(last - 1, 400);
     var from = last - n + 1;
-    var vals = sh.getRange(from, 1, n, 4).getValues();
-    for (var i = vals.length - 1; i >= 0; i--) {
-      var d0   = vals[i][0];
-      var dStr = (d0 instanceof Date) ? Utilities.formatDate(d0, 'Asia/Kolkata', 'yyyy-MM-dd') : String(d0);
-      var hit  = String(vals[i][2]) === csp && dStr === date;
-      if (hit && isView) hit = String(vals[i][3]) === page;   /* visits are per page */
-      if (hit) {
+    var keys = sh.getRange(from, keyCol, n, 1).getValues();
+    for (var i = keys.length - 1; i >= 0; i--) {
+      if (String(keys[i][0]) === key) {
         var row = from + i;
         sh.getRange(row, countCol).setValue(Number(sh.getRange(row, countCol).getValue() || 1) + 1);
         sh.getRange(row, 2).setValue(time);
@@ -64,7 +66,7 @@ function doGet(e) {
   }
 
   sh.appendRow(isView
-    ? [date, time, csp, page, lang, 1]
-    : [date, time, csp, page, lang, 'Pending', 1, '']);
+    ? [date, time, csp, page, lang, 1, key]
+    : [date, time, csp, page, lang, 'Pending', 1, '', key]);
   return ContentService.createTextOutput('ok');
 }

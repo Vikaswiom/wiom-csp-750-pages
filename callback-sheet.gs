@@ -24,11 +24,12 @@ function doGet(e) {
   if (String(p.action || '') === 'stats') {
     var ssx   = SpreadsheetApp.getActiveSpreadsheet();
     var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd');
+    var isDate = function (v) { return v && typeof v.getTime === 'function'; };
     var dstr  = function (v) {
-      return (v instanceof Date) ? Utilities.formatDate(v, 'Asia/Kolkata', 'yyyy-MM-dd') : String(v);
+      return isDate(v) ? Utilities.formatDate(v, 'Asia/Kolkata', 'yyyy-MM-dd') : String(v);
     };
     var hstr  = function (v) {
-      if (v instanceof Date) return Utilities.formatDate(v, 'Asia/Kolkata', 'HH');
+      if (isDate(v)) return Utilities.formatDate(v, 'Asia/Kolkata', 'HH');
       var s = String(v); return s.length >= 2 ? s.substring(0, 2) : '';
     };
     var days = {}, hours = {}, uniq = { flow: {}, faq: {}, call: {} };
@@ -54,7 +55,7 @@ function doGet(e) {
       }
     }
     var csh = ssx.getSheetByName('Callbacks');
-    var pending = 0;
+    var pend = {};
     if (csh && csh.getLastRow() > 1) {
       var cv = csh.getRange(2, 1, csh.getLastRow() - 1, 6).getValues();
       for (var b = 0; b < cv.length; b++) {
@@ -63,7 +64,7 @@ function doGet(e) {
         uniq.call[cc] = 1;
         day(cd).calls[cc] = 1;
         if (cd === today) hour(hstr(cv[b][1])).calls[cc] = 1;
-        if (String(cv[b][5]) === 'Pending') pending++;
+        if (String(cv[b][5]) === 'Pending') pend[cc] = 1;   /* unique CSPs, not rows */
       }
     }
 
@@ -81,7 +82,7 @@ function doGet(e) {
     var stats = {
       updated: new Date().toISOString(),
       today: today,
-      totals: { flow: n(uniq.flow), faq: n(uniq.faq), calls: n(uniq.call), pending: pending },
+      totals: { flow: n(uniq.flow), faq: n(uniq.faq), calls: n(uniq.call), pending: n(pend) },
       days: dayList,
       hours: hourList
     };

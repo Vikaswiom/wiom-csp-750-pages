@@ -104,8 +104,10 @@ function doGet(e) {
     : ['date', 'time (IST)', 'csp_id', 'page', 'lang', 'status', 'requests', 'notes'];
   var countCol = isView ? 6 : 7;
 
-  header = header.concat(['key']);          /* last column: dedup key, plain text */
-  var keyCol = header.length;
+  header = header.concat(['key', 'last_t']);   /* dedup key + the beacon's own timestamp */
+  var keyCol = header.length - 1;
+  var tCol   = header.length;
+  var stamp  = String(p.t || '');
 
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sh = ss.getSheetByName(name);
@@ -131,19 +133,25 @@ function doGet(e) {
   if (last > 1) {
     var n    = Math.min(last - 1, 400);
     var from = last - n + 1;
-    var keys = sh.getRange(from, keyCol, n, 1).getValues();
+    var keys = sh.getRange(from, keyCol, n, 2).getValues();   /* key + last_t */
     for (var i = keys.length - 1; i >= 0; i--) {
       if (String(keys[i][0]) === key) {
         var row = from + i;
+        /* The page fires two channels (no-cors fetch + Image) with the SAME t, so the
+           second arrival is the same tap, not a second one. Same t = duplicate: skip it. */
+        if (stamp && String(keys[i][1]) === stamp) {
+          return ContentService.createTextOutput('ok-same-t');
+        }
         sh.getRange(row, countCol).setValue(Number(sh.getRange(row, countCol).getValue() || 1) + 1);
         sh.getRange(row, 2).setValue(time);
+        if (stamp) sh.getRange(row, tCol).setValue(stamp);
         return ContentService.createTextOutput('ok-dup');
       }
     }
   }
 
   sh.appendRow(isView
-    ? [date, time, csp, page, lang, 1, key]
-    : [date, time, csp, page, lang, 'Pending', 1, '', key]);
+    ? [date, time, csp, page, lang, 1, key, stamp]
+    : [date, time, csp, page, lang, 'Pending', 1, '', key, stamp]);
   return ContentService.createTextOutput('ok');
 }

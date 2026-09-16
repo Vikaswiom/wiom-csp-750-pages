@@ -1147,21 +1147,21 @@ render();
      channels: a no-cors fetch (follows redirects, no response needed) and an Image.
      Either one reaching the server writes the row; both failing is a dead network. */
   function sheetBeacon(url){
-    var sent = false;
-    try {
-      if (typeof fetch === 'function') {
-        fetch(url, { mode: 'no-cors', cache: 'no-store', keepalive: true });
-        sent = true;
-      }
-    } catch (e) {}
-    try { new Image().src = url; sent = true; } catch (e) {}
-    if (!sent) {
+    /* ONE request per tap. The channels are a fallback chain, not a broadcast —
+       firing fetch and Image together put two identical rows in the sheet. */
+    function viaImage(){ try { new Image().src = url; return true; } catch (e) { return false; } }
+    function viaXhr(){
+      try { var x = new XMLHttpRequest(); x.open('GET', url, true); x.send(); return true; }
+      catch (e) { return false; }
+    }
+    if (typeof fetch === 'function') {
       try {
-        var x = new XMLHttpRequest();
-        x.open('GET', url, true);
-        x.send();
+        fetch(url, { mode: 'no-cors', cache: 'no-store', keepalive: true })
+          .catch(function(){ if (!viaImage()) viaXhr(); });   /* only if it actually failed */
+        return;
       } catch (e) {}
     }
+    if (!viaImage()) viaXhr();
   }
 
   /* ── Visit log ──

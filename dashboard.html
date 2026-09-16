@@ -73,12 +73,10 @@
   <div class="tiles">
     <div class="tile"><div class="lab"><i class="dot" style="background:var(--s1)"></i>Opened the offer</div>
       <div class="num" id="t-flow">—</div><div class="note">unique CSPs</div></div>
-    <div class="tile"><div class="lab"><i class="dot" style="background:var(--s2)"></i>Read the FAQ</div>
+    <div class="tile"><div class="lab"><i class="dot" style="background:var(--s2)"></i>Visited the FAQ page</div>
       <div class="num" id="t-faq">—</div><div class="note" id="t-faq-note">unique CSPs</div></div>
     <div class="tile"><div class="lab"><i class="dot" style="background:var(--s3)"></i>Asked for a call</div>
       <div class="num" id="t-call">—</div><div class="note" id="t-call-note">unique CSPs</div></div>
-    <div class="tile"><div class="lab">Pending callbacks</div>
-      <div class="num" id="t-pend">—</div><div class="note">still marked Pending</div></div>
   </div>
 
   <div class="card">
@@ -86,7 +84,7 @@
     <p class="cap">One count per CSP per day — reopening the page does not add to it.</p>
     <div class="legend">
       <span><i class="dot" style="background:var(--s1)"></i>Opened the offer</span>
-      <span><i class="dot" style="background:var(--s2)"></i>Read the FAQ</span>
+      <span><i class="dot" style="background:var(--s2)"></i>Visited the FAQ page</span>
       <span><i class="dot" style="background:var(--s3)"></i>Asked for a call</span>
     </div>
     <svg class="chart" id="daily" preserveAspectRatio="none"></svg>
@@ -100,7 +98,7 @@
     <p class="cap">Hour of each CSP's most recent activity, IST.</p>
     <div class="legend">
       <span><i class="dot" style="background:var(--s1)"></i>Opened the offer</span>
-      <span><i class="dot" style="background:var(--s2)"></i>Read the FAQ</span>
+      <span><i class="dot" style="background:var(--s2)"></i>Visited the FAQ page</span>
       <span><i class="dot" style="background:var(--s3)"></i>Asked for a call</span>
     </div>
     <svg class="chart" id="hourly" preserveAspectRatio="none"></svg>
@@ -114,7 +112,7 @@
 (function(){
   var EXEC = 'https://script.google.com/macros/s/AKfycbzoETDCLj11-R8D17i7D17y6z5w2gVVeYCRLogaoWCnfQc-SJ-dlbM2piIhfB68ecS9/exec';
   var S = ['var(--s1)', 'var(--s2)', 'var(--s3)'];
-  var NAMES = ['Opened the offer', 'Read the FAQ', 'Asked for a call'];
+  var NAMES = ['Opened the offer', 'Visited the FAQ page', 'Asked for a call'];
   var KEYS = ['flow', 'faq', 'calls'];
   var tip = document.getElementById('tip');
   var NS = 'http://www.w3.org/2000/svg';
@@ -147,7 +145,6 @@
     document.getElementById('t-flow').textContent = t.flow || 0;
     document.getElementById('t-faq').textContent  = t.faq || 0;
     document.getElementById('t-call').textContent = t.calls || 0;
-    document.getElementById('t-pend').textContent = t.pending || 0;
     document.getElementById('t-faq-note').textContent  = pct(t.faq, t.flow) + ' of those who opened';
     document.getElementById('t-call-note').textContent = pct(t.calls, t.flow) + ' of those who opened';
     document.getElementById('today-date').textContent = d.today ? '· ' + d.today : '';

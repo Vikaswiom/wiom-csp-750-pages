@@ -32,13 +32,13 @@ function doGet(e) {
       if (isDate(v)) return Utilities.formatDate(v, 'Asia/Kolkata', 'HH');
       var s = String(v); return s.length >= 2 ? s.substring(0, 2) : '';
     };
-    var days = {}, hours = {}, uniq = { flow: {}, faq: {}, call: {} };
+    var days = {}, hours = {}, uniq = { flow: {}, faq: {}, call: {}, optin: {} };
     var day  = function (d) {
-      if (!days[d]) days[d] = { d: d, flow: {}, faq: {}, calls: {} };
+      if (!days[d]) days[d] = { d: d, flow: {}, faq: {}, calls: {}, optins: {} };
       return days[d];
     };
     var hour = function (h) {
-      if (!hours[h]) hours[h] = { h: h, flow: {}, faq: {}, calls: {} };
+      if (!hours[h]) hours[h] = { h: h, flow: {}, faq: {}, calls: {}, optins: {} };
       return hours[h];
     };
 
@@ -68,21 +68,33 @@ function doGet(e) {
       }
     }
 
+    var osh = ssx.getSheetByName('Optins');
+    if (osh && osh.getLastRow() > 1) {
+      var ov = osh.getRange(2, 1, osh.getLastRow() - 1, 3).getValues();
+      for (var c = 0; c < ov.length; c++) {
+        var od = dstr(ov[c][0]), oc = String(ov[c][2]);
+        if (!oc) continue;
+        uniq.optin[oc] = 1;
+        day(od).optins[oc] = 1;
+        if (od === today) hour(hstr(ov[c][1])).optins[oc] = 1;
+      }
+    }
+
     var n = function (o) { var c = 0, k; for (k in o) if (o.hasOwnProperty(k)) c++; return c; };
     var dayList = [], hourList = [], kk;
     for (kk in days) if (days.hasOwnProperty(kk)) {
-      dayList.push({ d: days[kk].d, flow: n(days[kk].flow), faq: n(days[kk].faq), calls: n(days[kk].calls) });
+      dayList.push({ d: days[kk].d, flow: n(days[kk].flow), faq: n(days[kk].faq), calls: n(days[kk].calls), optins: n(days[kk].optins) });
     }
     dayList.sort(function (x, y) { return x.d < y.d ? -1 : 1; });
     for (kk in hours) if (hours.hasOwnProperty(kk)) {
-      hourList.push({ h: hours[kk].h, flow: n(hours[kk].flow), faq: n(hours[kk].faq), calls: n(hours[kk].calls) });
+      hourList.push({ h: hours[kk].h, flow: n(hours[kk].flow), faq: n(hours[kk].faq), calls: n(hours[kk].calls), optins: n(hours[kk].optins) });
     }
     hourList.sort(function (x, y) { return x.h < y.h ? -1 : 1; });
 
     var stats = {
       updated: new Date().toISOString(),
       today: today,
-      totals: { flow: n(uniq.flow), faq: n(uniq.faq), calls: n(uniq.call), pending: n(pend) },
+      totals: { flow: n(uniq.flow), faq: n(uniq.faq), calls: n(uniq.call), optins: n(uniq.optin), pending: n(pend) },
       days: dayList,
       hours: hourList
     };
@@ -94,16 +106,21 @@ function doGet(e) {
     return ContentService.createTextOutput(body).setMimeType(ContentService.MimeType.JSON);
   }
 
-  var isView = String(p.flow || '').trim().toUpperCase() === 'P750VIEW';
-  /* visits arrive as vid= so that an older deployment of this script (which only
-     knows uid=) ignores them instead of dumping page views into Callbacks */
-  var csp    = String((isView ? p.vid : p.uid) || p.uid || p.csp || p.csp_id || '').trim().substring(0, 80);
+  var flowName = String(p.flow || '').trim().toUpperCase();
+  var isView   = flowName === 'P750VIEW';
+  var isOptin  = flowName === 'P750OPTIN';
+  /* each kind uses its own id param (vid / oid / uid) so an older deployment of this
+     script simply ignores the kinds it does not know, instead of mixing tabs */
+  var csp = String((isView ? p.vid : isOptin ? p.oid : p.uid) || p.uid || p.csp || p.csp_id || '')
+              .trim().substring(0, 80);
   if (!csp) return ContentService.createTextOutput('no-csp');
-  var name   = isView ? 'Visits' : 'Callbacks';
+  var name   = isView ? 'Visits' : isOptin ? 'Optins' : 'Callbacks';
   var header = isView
     ? ['date', 'time (IST)', 'csp_id', 'page', 'lang', 'opens']
-    : ['date', 'time (IST)', 'csp_id', 'page', 'lang', 'status', 'requests', 'notes'];
-  var countCol = isView ? 6 : 7;
+    : isOptin
+      ? ['date', 'time (IST)', 'csp_id', 'page', 'lang', 'confirms']
+      : ['date', 'time (IST)', 'csp_id', 'page', 'lang', 'status', 'requests', 'notes'];
+  var countCol = (isView || isOptin) ? 6 : 7;
 
   header = header.concat(['key', 'last_t']);   /* dedup key + the beacon's own timestamp */
   var keyCol = header.length - 1;
@@ -129,7 +146,7 @@ function doGet(e) {
   /* Dedup on a key the script writes itself. Never compare the date CELL: Sheets
      turns it into a Date in the spreadsheet's own timezone, and re-formatting that
      in IST can land on the previous day — which is why dedup silently never matched. */
-  var key  = 'k' + date + '|' + csp + (isView ? '|' + page : '');
+  var key  = 'k' + date + '|' + csp + ((isView || isOptin) ? '|' + page : '');
   var last = sh.getLastRow();
   if (last > 1) {
     var n    = Math.min(last - 1, 400);
@@ -151,7 +168,7 @@ function doGet(e) {
     }
   }
 
-  sh.appendRow(isView
+  sh.appendRow((isView || isOptin)
     ? [date, time, csp, page, lang, 1, key, stamp]
     : [date, time, csp, page, lang, 'Pending', 1, '', key, stamp]);
   return ContentService.createTextOutput('ok');

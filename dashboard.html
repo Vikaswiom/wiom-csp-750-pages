@@ -4,7 +4,7 @@
 <title>₹750 opt-in — reach & call requests</title>
 <style>
   :root{
-    --s1:#D9008D; --s2:#1F6FEB; --s3:#C77700;
+    --s1:#D9008D; --s2:#1F6FEB; --s3:#C77700; --s4:#1B7F4B;
     --bg:#fcfcfb; --card:#ffffff; --line:#E8E4F0; --grid:#F1EDF7;
     --ink:#161021; --ink2:#4A4356; --ink3:#7C7589;
     --good:#1B7F4B; --warn:#946200;
@@ -77,6 +77,8 @@
       <div class="num" id="t-faq">—</div><div class="note" id="t-faq-note">unique CSPs</div></div>
     <div class="tile"><div class="lab"><i class="dot" style="background:var(--s3)"></i>Asked for a call</div>
       <div class="num" id="t-call">—</div><div class="note" id="t-call-note">unique CSPs</div></div>
+    <div class="tile"><div class="lab"><i class="dot" style="background:var(--s4)"></i>Opted in</div>
+      <div class="num" id="t-optin">—</div><div class="note" id="t-optin-note">confirmed the new structure</div></div>
   </div>
 
   <div class="card">
@@ -86,10 +88,11 @@
       <span><i class="dot" style="background:var(--s1)"></i>Opened the offer</span>
       <span><i class="dot" style="background:var(--s2)"></i>Visited the FAQ page</span>
       <span><i class="dot" style="background:var(--s3)"></i>Asked for a call</span>
+      <span><i class="dot" style="background:var(--s4)"></i>Opted in</span>
     </div>
     <svg class="chart" id="daily" preserveAspectRatio="none"></svg>
     <details><summary>Show as a table</summary>
-      <table id="daily-t"><thead><tr><th>Date</th><th>Offer</th><th>FAQ</th><th>Calls</th></tr></thead><tbody></tbody></table>
+      <table id="daily-t"><thead><tr><th>Date</th><th>Offer</th><th>FAQ</th><th>Calls</th><th>Opted in</th></tr></thead><tbody></tbody></table>
     </details>
   </div>
 
@@ -100,6 +103,7 @@
       <span><i class="dot" style="background:var(--s1)"></i>Opened the offer</span>
       <span><i class="dot" style="background:var(--s2)"></i>Visited the FAQ page</span>
       <span><i class="dot" style="background:var(--s3)"></i>Asked for a call</span>
+      <span><i class="dot" style="background:var(--s4)"></i>Opted in</span>
     </div>
     <svg class="chart" id="hourly" preserveAspectRatio="none"></svg>
   </div>
@@ -111,9 +115,9 @@
 <script>
 (function(){
   var EXEC = 'https://script.google.com/macros/s/AKfycbzoETDCLj11-R8D17i7D17y6z5w2gVVeYCRLogaoWCnfQc-SJ-dlbM2piIhfB68ecS9/exec';
-  var S = ['var(--s1)', 'var(--s2)', 'var(--s3)'];
-  var NAMES = ['Opened the offer', 'Visited the FAQ page', 'Asked for a call'];
-  var KEYS = ['flow', 'faq', 'calls'];
+  var S = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)'];
+  var NAMES = ['Opened the offer', 'Visited the FAQ page', 'Asked for a call', 'Opted in'];
+  var KEYS = ['flow', 'faq', 'calls', 'optins'];
   var tip = document.getElementById('tip');
   var NS = 'http://www.w3.org/2000/svg';
 
@@ -145,6 +149,8 @@
     document.getElementById('t-flow').textContent = t.flow || 0;
     document.getElementById('t-faq').textContent  = t.faq || 0;
     document.getElementById('t-call').textContent = t.calls || 0;
+    document.getElementById('t-optin').textContent = t.optins || 0;
+    document.getElementById('t-optin-note').textContent = pct(t.optins, t.flow) + ' of those who opened';
     document.getElementById('t-faq-note').textContent  = pct(t.faq, t.flow) + ' of those who opened';
     document.getElementById('t-call-note').textContent = pct(t.calls, t.flow) + ' of those who opened';
     document.getElementById('today-date').textContent = d.today ? '· ' + d.today : '';
@@ -158,7 +164,7 @@
     tb.innerHTML = '';
     (d.days || []).slice().reverse().forEach(function(r){
       var tr = document.createElement('tr');
-      tr.innerHTML = '<td>' + r.d + '</td><td>' + r.flow + '</td><td>' + r.faq + '</td><td>' + r.calls + '</td>';
+      tr.innerHTML = '<td>' + r.d + '</td><td>' + r.flow + '</td><td>' + r.faq + '</td><td>' + r.calls + '</td><td>' + (r.optins || 0) + '</td>';
       tb.appendChild(tr);
     });
   }
@@ -186,7 +192,7 @@
 
   function lines(svg, rows, xKey){
     var maxV = 0;
-    rows.forEach(function(r){ KEYS.forEach(function(k){ if (r[k] > maxV) maxV = r[k]; }); });
+    rows.forEach(function(r){ KEYS.forEach(function(k){ r[k] = r[k] || 0; if (r[k] > maxV) maxV = r[k]; }); });
     var f = frame(svg, rows, maxV); if (!f) return;
     var n = rows.length;
     var X = function(i){ return n === 1 ? (f.L + f.W - f.R) / 2 : f.L + (f.W - f.L - f.R) * (i / (n - 1)); };
@@ -219,7 +225,7 @@
 
   function bars(svg, rows){
     var maxV = 0;
-    rows.forEach(function(r){ KEYS.forEach(function(k){ if (r[k] > maxV) maxV = r[k]; }); });
+    rows.forEach(function(r){ KEYS.forEach(function(k){ r[k] = r[k] || 0; if (r[k] > maxV) maxV = r[k]; }); });
     var f = frame(svg, rows, maxV); if (!f) return;
     var n = rows.length;
     var slot = (f.W - f.L - f.R) / n, bw = Math.max(3, Math.min(14, slot / 4));

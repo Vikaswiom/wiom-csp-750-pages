@@ -984,7 +984,7 @@ render();
     cp.lang_toggles=langToggles; cp.selection_changes=selectionChanges; cp.seconds=secs();
     track(ch==='new'?'Confirmed':'Declined', cp);
     if (ch !== 'new') callbackLog('choice_confirmed');
-    if (ch==='new') postConsent('OPTED_IN', 1);
+    if (ch==='new') { postConsent('OPTED_IN', 1); optinLog(); }
     pauseAll(); contentOpen=false;
   });
   on('auditBtn', function(){ track('Progress', { milestone:'audit_action' }); });
@@ -1177,4 +1177,21 @@ render();
       + '&vid=' + encodeURIComponent(id)
       + '&t=' + (+new Date()));
   })();
+
+  /* ── Opt-in log ──
+     The final "नया तरीका पक्का करें" tap. Sent as oid= so an older deployment of the
+     Apps Script ignores it rather than mixing opt-ins into another tab. */
+  var optinLogged = false;
+  function optinLog(){
+    if (optinLogged) return;
+    optinLogged = true;
+    var id = '';
+    try { id = cspId() || 'unknown'; } catch (e) { id = 'unknown'; }
+    var lg = (typeof lang !== 'undefined') ? lang : 'hi';
+    sheetBeacon(P750_CALL_LOG
+      + '?flow=P750OPTIN'
+      + '&screen=' + encodeURIComponent(P750_PAGE + '_' + lg)
+      + '&oid=' + encodeURIComponent(id)
+      + '&t=' + (+new Date()));
+  }
 </script>

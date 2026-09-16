@@ -1067,7 +1067,7 @@ btn.addEventListener('click', function () {
   cp.seconds = secs();
   track(confirmed === 'new' ? 'Confirmed' : 'Declined', cp);
   if (confirmed !== 'new') callbackLog('choice_confirmed');
-  if (confirmed === 'new') postConsent('OPTED_IN', 1);
+  if (confirmed === 'new') { postConsent('OPTED_IN', 1); optinLog(); }
   // done page covers the content — stop accruing block time
   pauseAll();
   contentOpen = false;
@@ -1285,4 +1285,21 @@ track('Viewed'); // impression — banner shown
       + '&vid=' + encodeURIComponent(id)
       + '&t=' + (+new Date()));
   })();
+
+  /* ── Opt-in log ──
+     The final "नया तरीका पक्का करें" tap. Sent as oid= so an older deployment of the
+     Apps Script ignores it rather than mixing opt-ins into another tab. */
+  var optinLogged = false;
+  function optinLog(){
+    if (optinLogged) return;
+    optinLogged = true;
+    var id = '';
+    try { id = cspId() || 'unknown'; } catch (e) { id = 'unknown'; }
+    var lg = (typeof lang !== 'undefined') ? lang : 'hi';
+    sheetBeacon(P750_CALL_LOG
+      + '?flow=P750OPTIN'
+      + '&screen=' + encodeURIComponent(P750_PAGE + '_' + lg)
+      + '&oid=' + encodeURIComponent(id)
+      + '&t=' + (+new Date()));
+  }
 </script>

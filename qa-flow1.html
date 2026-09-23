@@ -1186,9 +1186,53 @@ track('Viewed'); // impression — banner shown
     setTimeout(function(){ if (!left && location.href.indexOf("csp.wiom.in") < 0) ctDismiss(); }, 1500);
   }
 
-  function bind(id){ var el = document.getElementById(id); if (el) el.addEventListener("click", goHome); }
+  /* ── FPN entry: close instead of handing over ──
+     Opened from the FPN screen the CSP is mid-task, so the confirmation ends with
+     "ठीक है" and simply closes this page, returning him to where he was. Every
+     other surface keeps "सारे काम देखें" -> the connections screen. */
+  function closePage(){
+    try{ track("Progress", { milestone:"closed_fpn" }); }catch(e){}
+    if (ctDismiss()) return;
+    /* an app-provided bridge, if this WebView exposes one */
+    try{ if (window.Android && typeof window.Android.close === "function"){ window.Android.close(); return; } }catch(e){}
+    try{ if (window.AndroidBridge && typeof window.AndroidBridge.close === "function"){ window.AndroidBridge.close(); return; } }catch(e){}
+    try{ var wk2 = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.close;
+      if (wk2){ wk2.postMessage({}); return; } }catch(e){}
+    try{ window.close(); }catch(e){}
+    /* window.close() is ignored for pages the script did not open — go back instead */
+    setTimeout(function(){
+      if (left) return;
+      try{ if (history.length > 1){ history.back(); return; } }catch(e){}
+      try{ window.top.close(); }catch(e){}
+    }, 250);
+  }
+
+  function isFpn(){
+    try{ return P750_SRC() === "fpn"; }catch(e){ return false; }
+  }
+
+  function endTap(){ if (isFpn()) closePage(); else goHome(); }
+
+  function bind(id){ var el = document.getElementById(id); if (el) el.addEventListener("click", endTap); }
   bind("endBtn");   /* flow1 confirmation, flow2/3 confirmation */
   bind("okBtn");    /* flow2/3 thank-you page */
+
+  /* relabel the CTA on the FPN entry, in whichever language is showing */
+  function relabel(){
+    if (!isFpn()) return;
+    var txt = (typeof lang !== "undefined" && lang === "en") ? "OK" : "ठीक है";
+    ["endBtn", "okBtn"].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el){ el.removeAttribute("data-i18n"); el.textContent = txt; }
+    });
+  }
+  relabel();
+  document.addEventListener("click", function(e){
+    /* the language toggle re-renders from data-i18n, so re-apply after it */
+    if (e.target && e.target.className && String(e.target.className).indexOf("langtoggle") > -1){
+      setTimeout(relabel, 0);
+    }
+  }, true);
 })();
 
   /* ── FAQ shortcut ──────────────────────────────────────────────

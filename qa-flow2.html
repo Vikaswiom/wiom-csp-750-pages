@@ -1092,7 +1092,7 @@ render();
     b.addEventListener('click', function(){
       var id = '';
       try { id = cspId(); } catch (e) {}
-      var url = 'faq.html?src=' + encodeURIComponent(P750_SRC)
+      var url = 'faq.html?src=' + encodeURIComponent(P750_SRC())
               + '&cspId=' + encodeURIComponent(id || '')
               + '&lang=' + (typeof lang !== 'undefined' ? lang : 'hi');
       try { track('Progress', { milestone: 'faq_opened' }); } catch (e) {}
@@ -1117,7 +1117,7 @@ render();
     var lg = (typeof lang !== 'undefined') ? lang : 'hi';
     sheetBeacon(P750_CALL_LOG
       + '?flow=P750CALL'
-      + '&src=' + encodeURIComponent(P750_SRC)
+      + '&src=' + encodeURIComponent(P750_SRC())
       + '&screen=' + encodeURIComponent(P750_PAGE + '_' + lg)
       + '&uid=' + encodeURIComponent(id)
       + '&t=' + (+new Date()));
@@ -1174,7 +1174,7 @@ render();
     var lg = (typeof lang !== 'undefined') ? lang : 'hi';
     sheetBeacon(P750_CALL_LOG
       + '?flow=P750VIEW'
-      + '&src=' + encodeURIComponent(P750_SRC)
+      + '&src=' + encodeURIComponent(P750_SRC())
       + '&screen=' + encodeURIComponent(P750_PAGE + '_' + lg)
       + '&vid=' + encodeURIComponent(id)
       + '&t=' + (+new Date()));
@@ -1192,7 +1192,7 @@ render();
     var lg = (typeof lang !== 'undefined') ? lang : 'hi';
     sheetBeacon(P750_CALL_LOG
       + '?flow=P750OPTIN'
-      + '&src=' + encodeURIComponent(P750_SRC)
+      + '&src=' + encodeURIComponent(P750_SRC())
       + '&screen=' + encodeURIComponent(P750_PAGE + '_' + lg)
       + '&oid=' + encodeURIComponent(id)
       + '&t=' + (+new Date()));
@@ -1202,7 +1202,9 @@ render();
      Where the CSP came from: ?src=fpn (FPN screen), ?src=bell (bell icon), etc.
      Captured once and kept in sessionStorage so it survives the hop to faq.html
      and any URL rewrite, exactly like the CSP id. */
-  var P750_SRC = (function(){
+  var P750_SRC_CACHE = null;
+  function P750_SRC(){
+    if (P750_SRC_CACHE !== null) return P750_SRC_CACHE;
     var v = '';
     try {
       var m = /[?&#]s(?:rc|ource)=([^&#]+)/i.exec(location.href || '');
@@ -1212,6 +1214,7 @@ render();
       if (v) sessionStorage.setItem('p750_src', v);
     } catch (e) {}
     v = String(v).replace(/[^A-Za-z0-9_-]/g, '').substring(0, 24);
-    return v || 'direct';
-  })();
+    P750_SRC_CACHE = v || 'direct';
+    return P750_SRC_CACHE;
+  }
 </script>

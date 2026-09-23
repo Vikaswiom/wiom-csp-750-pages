@@ -1093,7 +1093,8 @@ render();
     b.addEventListener('click', function(){
       var id = '';
       try { id = cspId(); } catch (e) {}
-      var url = 'faq.html?cspId=' + encodeURIComponent(id || '')
+      var url = 'faq.html?src=' + encodeURIComponent(P750_SRC)
+              + '&cspId=' + encodeURIComponent(id || '')
               + '&lang=' + (typeof lang !== 'undefined' ? lang : 'hi');
       try { track('Progress', { milestone: 'faq_opened' }); } catch (e) {}
       setTimeout(function(){ location.href = url; }, 120);
@@ -1117,6 +1118,7 @@ render();
     var lg = (typeof lang !== 'undefined') ? lang : 'hi';
     sheetBeacon(P750_CALL_LOG
       + '?flow=P750CALL'
+      + '&src=' + encodeURIComponent(P750_SRC)
       + '&screen=' + encodeURIComponent(P750_PAGE + '_' + lg)
       + '&uid=' + encodeURIComponent(id)
       + '&t=' + (+new Date()));
@@ -1173,6 +1175,7 @@ render();
     var lg = (typeof lang !== 'undefined') ? lang : 'hi';
     sheetBeacon(P750_CALL_LOG
       + '?flow=P750VIEW'
+      + '&src=' + encodeURIComponent(P750_SRC)
       + '&screen=' + encodeURIComponent(P750_PAGE + '_' + lg)
       + '&vid=' + encodeURIComponent(id)
       + '&t=' + (+new Date()));
@@ -1190,8 +1193,26 @@ render();
     var lg = (typeof lang !== 'undefined') ? lang : 'hi';
     sheetBeacon(P750_CALL_LOG
       + '?flow=P750OPTIN'
+      + '&src=' + encodeURIComponent(P750_SRC)
       + '&screen=' + encodeURIComponent(P750_PAGE + '_' + lg)
       + '&oid=' + encodeURIComponent(id)
       + '&t=' + (+new Date()));
   }
+
+  /* ── Entry source ──
+     Where the CSP came from: ?src=fpn (FPN screen), ?src=bell (bell icon), etc.
+     Captured once and kept in sessionStorage so it survives the hop to faq.html
+     and any URL rewrite, exactly like the CSP id. */
+  var P750_SRC = (function(){
+    var v = '';
+    try {
+      var m = /[?&#]s(?:rc|ource)=([^&#]+)/i.exec(location.href || '');
+      if (m) v = decodeURIComponent(m[1]);
+      if (!v) { var f = /[?&#]from=([^&#]+)/i.exec(location.href || ''); if (f) v = decodeURIComponent(f[1]); }
+      if (!v) v = sessionStorage.getItem('p750_src') || '';
+      if (v) sessionStorage.setItem('p750_src', v);
+    } catch (e) {}
+    v = String(v).replace(/[^A-Za-z0-9_-]/g, '').substring(0, 24);
+    return v || 'direct';
+  })();
 </script>

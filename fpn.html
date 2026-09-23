@@ -1,0 +1,18 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>₹750 — FPN screen</title>
+<!-- Named entry point for the FPN screen. It is NOT a copy of the offer page:
+     it forwards to flow1.html tagged src=fpn, so there is one page to maintain
+     and every event from here is attributed to this surface.
+        fpn.html?cspId=<CSP_ID>   ->   flow1.html?cspId=<CSP_ID>&src=fpn -->
+<script>
+(function(){
+  var q = String(location.search || '') + String(location.hash || '');
+  var m = /[?&#]csp[_-]?id=([^&#]+)/i.exec(q);
+  var id = m ? decodeURIComponent(m[1]) : '';
+  var url = 'flow1.html?src=fpn' + (id ? '&cspId=' + encodeURIComponent(id) : '');
+  location.replace(url);          /* replace, so Back does not bounce through here */
+})();
+</script>
+<noscript><a href="flow1.html?src=fpn">Continue</a></noscript>

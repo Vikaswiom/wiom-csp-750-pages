@@ -1314,7 +1314,7 @@ track('Viewed'); // impression — banner shown
      and any URL rewrite, exactly like the CSP id. */
   var P750_SRC_CACHE = null;
   function P750_SRC(){
-    if (P750_SRC_CACHE !== null) return P750_SRC_CACHE;
+    if (P750_SRC_CACHE) return P750_SRC_CACHE;   /* truthy check: a hoisted var reads as undefined, not null */
     var v = '';
     try {
       var m = /[?&#]s(?:rc|ource)=([^&#]+)/i.exec(location.href || '');

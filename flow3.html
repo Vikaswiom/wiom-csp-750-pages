@@ -1141,7 +1141,23 @@ render();
       "cursor:pointer","-webkit-tap-highlight-color:transparent"
     ].join(";");
     b.addEventListener("click", function(e){ e.preventDefault(); closePage(); });
-    function attach(){ if (document.body && !document.getElementById("fpnClose")) document.body.appendChild(b); }
+
+    /* Keep it on the page card, not the browser edge: the content is a centred
+       420px column, so align to that column's left edge (on a phone they coincide). */
+    function place(){
+      var host = document.querySelector(".phone") || document.querySelector(".content");
+      if (!host) return;
+      var r = host.getBoundingClientRect();
+      var x = (r.left > 0 ? r.left : 0) + 12;
+      b.style.left = Math.round(x) + "px";
+    }
+    function attach(){
+      if (!document.body || document.getElementById("fpnClose")) return;
+      document.body.appendChild(b);
+      place();
+      window.addEventListener("resize", place);
+      window.addEventListener("orientationchange", place);
+    }
     if (document.body) attach();
     else document.addEventListener("DOMContentLoaded", attach);
   })();

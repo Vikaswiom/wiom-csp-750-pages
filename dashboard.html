@@ -81,6 +81,15 @@
       <div class="num" id="t-optin">—</div><div class="note" id="t-optin-note">confirmed the new structure</div></div>
   </div>
 
+  <div class="card" id="src-card" style="display:none">
+    <h2>By entry point</h2>
+    <p class="cap">Where the CSP came in from — the FPN screen, the bell icon, or a direct link.</p>
+    <table id="src-t">
+      <thead><tr><th>Source</th><th>Opened</th><th>FAQ</th><th>Calls</th><th>Opted in</th><th>Opt-in rate</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
   <div class="card">
     <h2>Unique CSPs per day</h2>
     <p class="cap">One count per CSP per day — reopening the page does not add to it.</p>
@@ -156,6 +165,21 @@
     document.getElementById('today-date').textContent = d.today ? '· ' + d.today : '';
     var when = new Date(d.updated);
     document.getElementById('stamp').textContent = 'updated ' + when.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+    var srcs = d.sources || [];
+    if (srcs.length){
+      document.getElementById('src-card').style.display = '';
+      var sb = document.querySelector('#src-t tbody');
+      sb.innerHTML = '';
+      var NICE = { fpn: 'FPN screen', bell: 'Bell icon', direct: 'Direct link' };
+      srcs.forEach(function(s){
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + (NICE[s.src] || s.src) + '</td><td>' + s.flow + '</td><td>' + s.faq +
+                       '</td><td>' + s.calls + '</td><td>' + (s.optins || 0) + '</td><td>' +
+                       pct(s.optins || 0, s.flow) + '</td>';
+        sb.appendChild(tr);
+      });
+    }
 
     lines(document.getElementById('daily'), d.days || [], 'd');
     bars(document.getElementById('hourly'), d.hours || []);

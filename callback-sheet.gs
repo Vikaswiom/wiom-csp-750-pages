@@ -33,6 +33,12 @@ function doGet(e) {
       var s = String(v); return s.length >= 2 ? s.substring(0, 2) : '';
     };
     var days = {}, hours = {}, uniq = { flow: {}, faq: {}, call: {}, optin: {} };
+    var bySrc = {};
+    var srcSlot = function (s) {
+      s = s || 'direct';
+      if (!bySrc[s]) bySrc[s] = { src: s, flow: {}, faq: {}, calls: {}, optins: {} };
+      return bySrc[s];
+    };
     var day  = function (d) {
       if (!days[d]) days[d] = { d: d, flow: {}, faq: {}, calls: {}, optins: {} };
       return days[d];
@@ -44,12 +50,13 @@ function doGet(e) {
 
     var vsh = ssx.getSheetByName('Visits');
     if (vsh && vsh.getLastRow() > 1) {
-      var vv = vsh.getRange(2, 1, vsh.getLastRow() - 1, 4).getValues();
+      var vv = vsh.getRange(2, 1, vsh.getLastRow() - 1, 9).getValues();   /* ... source at col 9 */
       for (var a = 0; a < vv.length; a++) {
         var vd = dstr(vv[a][0]), vc = String(vv[a][2]), vp = String(vv[a][3]);
         if (!vc) continue;
         var key = (vp === 'faq') ? 'faq' : 'flow';
         uniq[key][vc] = 1;
+        srcSlot(String(vv[a][8] || ''))[key === 'faq' ? 'faq' : 'flow'][vc] = 1;
         day(vd)[key === 'faq' ? 'faq' : 'flow'][vc] = 1;
         if (vd === today) hour(hstr(vv[a][1]))[key === 'faq' ? 'faq' : 'flow'][vc] = 1;
       }
@@ -57,11 +64,12 @@ function doGet(e) {
     var csh = ssx.getSheetByName('Callbacks');
     var pend = {};
     if (csh && csh.getLastRow() > 1) {
-      var cv = csh.getRange(2, 1, csh.getLastRow() - 1, 6).getValues();
+      var cv = csh.getRange(2, 1, csh.getLastRow() - 1, 11).getValues();   /* ... source at col 11 */
       for (var b = 0; b < cv.length; b++) {
         var cd = dstr(cv[b][0]), cc = String(cv[b][2]);
         if (!cc) continue;
         uniq.call[cc] = 1;
+        srcSlot(String(cv[b][10] || '')).calls[cc] = 1;
         day(cd).calls[cc] = 1;
         if (cd === today) hour(hstr(cv[b][1])).calls[cc] = 1;
         if (String(cv[b][5]) === 'Pending') pend[cc] = 1;   /* unique CSPs, not rows */
@@ -70,11 +78,12 @@ function doGet(e) {
 
     var osh = ssx.getSheetByName('Optins');
     if (osh && osh.getLastRow() > 1) {
-      var ov = osh.getRange(2, 1, osh.getLastRow() - 1, 3).getValues();
+      var ov = osh.getRange(2, 1, osh.getLastRow() - 1, 9).getValues();   /* ... source at col 9 */
       for (var c = 0; c < ov.length; c++) {
         var od = dstr(ov[c][0]), oc = String(ov[c][2]);
         if (!oc) continue;
         uniq.optin[oc] = 1;
+        srcSlot(String(ov[c][8] || '')).optins[oc] = 1;
         day(od).optins[oc] = 1;
         if (od === today) hour(hstr(ov[c][1])).optins[oc] = 1;
       }
@@ -91,10 +100,18 @@ function doGet(e) {
     }
     hourList.sort(function (x, y) { return x.h < y.h ? -1 : 1; });
 
+    var srcList = [], sk;
+    for (sk in bySrc) if (bySrc.hasOwnProperty(sk)) {
+      srcList.push({ src: bySrc[sk].src, flow: n(bySrc[sk].flow), faq: n(bySrc[sk].faq),
+                     calls: n(bySrc[sk].calls), optins: n(bySrc[sk].optins) });
+    }
+    srcList.sort(function (x, y) { return y.flow - x.flow; });
+
     var stats = {
       updated: new Date().toISOString(),
       today: today,
       totals: { flow: n(uniq.flow), faq: n(uniq.faq), calls: n(uniq.call), optins: n(uniq.optin), pending: n(pend) },
+      sources: srcList,
       days: dayList,
       hours: hourList
     };
@@ -122,7 +139,8 @@ function doGet(e) {
       : ['date', 'time (IST)', 'csp_id', 'page', 'lang', 'status', 'requests', 'notes'];
   var countCol = (isView || isOptin) ? 6 : 7;
 
-  header = header.concat(['key', 'last_t']);   /* dedup key + the beacon's own timestamp */
+  var src = String(p.src || '').trim().replace(/[^A-Za-z0-9_-]/g, '').substring(0, 24) || 'direct';
+  header = header.concat(['key', 'last_t', 'source']);   /* appended, so older rows keep their layout */
   var keyCol = header.length - 1;
   var tCol   = header.length;
   var stamp  = String(p.t || '');
@@ -146,7 +164,9 @@ function doGet(e) {
   /* Dedup on a key the script writes itself. Never compare the date CELL: Sheets
      turns it into a Date in the spreadsheet's own timezone, and re-formatting that
      in IST can land on the previous day — which is why dedup silently never matched. */
-  var key  = 'k' + date + '|' + csp + ((isView || isOptin) ? '|' + page : '');
+  /* visits/opt-ins are per page AND per source, so one CSP arriving from the FPN
+     screen and from the bell icon on the same day shows as both */
+  var key  = 'k' + date + '|' + csp + ((isView || isOptin) ? '|' + page + '|' + src : '');
   var last = sh.getLastRow();
   if (last > 1) {
     var n    = Math.min(last - 1, 400);
@@ -169,7 +189,7 @@ function doGet(e) {
   }
 
   sh.appendRow((isView || isOptin)
-    ? [date, time, csp, page, lang, 1, key, stamp]
-    : [date, time, csp, page, lang, 'Pending', 1, '', key, stamp]);
+    ? [date, time, csp, page, lang, 1, key, stamp, src]
+    : [date, time, csp, page, lang, 'Pending', 1, '', key, stamp, src]);
   return ContentService.createTextOutput('ok');
 }

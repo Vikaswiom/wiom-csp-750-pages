@@ -171,7 +171,7 @@
       document.getElementById('src-card').style.display = '';
       var sb = document.querySelector('#src-t tbody');
       sb.innerHTML = '';
-      var NICE = { fpn: 'FPN screen', bell: 'Bell icon', direct: 'Direct link' };
+      var NICE = { fpn: 'FPN screen', bell: 'Bell icon (existing link)', direct: 'Untagged' };
       srcs.forEach(function(s){
         var tr = document.createElement('tr');
         tr.innerHTML = '<td>' + (NICE[s.src] || s.src) + '</td><td>' + s.flow + '</td><td>' + s.faq +

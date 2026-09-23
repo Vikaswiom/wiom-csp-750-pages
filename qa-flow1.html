@@ -1311,6 +1311,7 @@ track('Viewed'); // impression — banner shown
      Where the CSP came from: ?src=fpn (FPN screen), ?src=bell (bell icon), etc.
      Captured once and kept in sessionStorage so it survives the hop to faq.html
      and any URL rewrite, exactly like the CSP id. */
+  var P750_SRC_DEFAULT = 'bell';   /* change if the untagged link moves to another surface */
   var P750_SRC_CACHE = null;
   function P750_SRC(){
     if (P750_SRC_CACHE) return P750_SRC_CACHE;   /* truthy check: a hoisted var reads as undefined, not null */
@@ -1323,7 +1324,9 @@ track('Viewed'); // impression — banner shown
       if (v) sessionStorage.setItem('p750_src', v);
     } catch (e) {}
     v = String(v).replace(/[^A-Za-z0-9_-]/g, '').substring(0, 24);
-    P750_SRC_CACHE = v || 'direct';
+    /* The plain flow1 link is the one live on the bell icon, so an untagged visit
+       is a bell visit. New surfaces must carry ?src= (e.g. fpn.html -> src=fpn). */
+    P750_SRC_CACHE = v || P750_SRC_DEFAULT;
     return P750_SRC_CACHE;
   }
 </script>
